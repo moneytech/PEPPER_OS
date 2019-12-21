@@ -44,6 +44,7 @@ clean :
 mrproper :
 	rm -rf $(MIXT)
 
+
 		# $@ Le nom de la cible
 	# $< le nom de la première dépendance
 	# $^ la liste des dépendances
