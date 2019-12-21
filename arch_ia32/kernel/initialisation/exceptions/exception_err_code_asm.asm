@@ -7,7 +7,7 @@ section .text
 
 
 protection_fault_handler :
-    pop eax
+    pop eax ;take Error code and analyse it
     push eax
     call protection_fault
     iret
