@@ -10,6 +10,7 @@ protection_fault_handler :
     pop eax ;take Error code and analyse it
     push eax
     call protection_fault
+    pop eax
     iret
 
 
