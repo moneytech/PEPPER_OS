@@ -1,4 +1,4 @@
-global protection_fault_handler
+global exception_handler
 
 extern protection_fault
 
@@ -6,10 +6,10 @@ section .text
 
 
 ;eflags|cs:eip|error code
-protection_fault_handler :
+exception_handler :
     pop eax ;take Error code and analyse it
     push eax
-    call protection_fault
+    call exception
     pop eax
     iret
 
