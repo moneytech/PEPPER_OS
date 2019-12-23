@@ -1,6 +1,6 @@
 global exception_handler
 
-extern protection_fault
+extern exception
 
 section .text
 
