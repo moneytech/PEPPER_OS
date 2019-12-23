@@ -34,7 +34,7 @@ void init_idt() {
 	set_idt(0x08 , INTGATE , (unsigned long)irq14 , 0x2E);
     set_idt(0x08 , INTGATE , (unsigned long)irq15 , 0x2F); 
 
-    
+    set_idt(0x08 , INTGATE , (unsigned long)protection_fault_handler , 0x0D) ;
     
     print_address(LOADING_COLOR, (unsigned int)IDTBASE);
     write_string(READY_COLOR, " KERNEL : Chargement de la Table d'interruption ...\n");

@@ -11,6 +11,10 @@ all :
 	make disk
 	make launch
 
+debug_file:kernel.o
+	ld -m elf_i386 --oformat=elf32-i386 -Tlinker.ld $^ $(LINKER) -o kernel.elf
+
+
 mixt : kernel.o
 	$(LDFLAGS) $^ $(LINKER) -o kernel.bin
 

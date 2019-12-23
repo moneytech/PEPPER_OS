@@ -4,7 +4,7 @@ CFLAGS := -m32 -g -ffreestanding -fno-PIC -fno-stack-protector -Werror
 
 OBJ := pit.o pit_asm.o pic.o idt.o idt_asm.o gdt.o
 OBJ += interruptions/interrupt.o interruptions/interrupt_asm.o
-OBJ += exceptions/exception_err_code_asm.o exceptions/exception_err_code.o
+OBJ += exceptions/exception_asm.o exceptions/exception.o
 OBJ += ../../stdlib/video.o ../../stdlib/lib.o 
 
 MIXT = mixt

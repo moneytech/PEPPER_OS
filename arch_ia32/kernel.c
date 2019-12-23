@@ -8,5 +8,9 @@ void main() {
     cli ;
     init_gdt();
     init_idt();
-        sti ;
+
+    __asm__ __volatile__("movw $0x18, %ax \n \
+        movw %ax, %ss \n \
+        movl $0x20000, %esp");
+ sti ;
 }

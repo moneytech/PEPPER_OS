@@ -17,7 +17,7 @@ extern /* use IRQ 0 to accurately keep track of
         pour la définitionsd e la fréquence
     */
     unsigned long
-    PIT_handler();
+    PIT_handler() , protection_fault_handler();
 
 //Descripteur de segment:
 struct IDT_entry {
