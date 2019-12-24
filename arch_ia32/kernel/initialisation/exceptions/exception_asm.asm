@@ -1,16 +1,15 @@
-global exception_handler
+global _general_protection_fault_handler_
 
 extern exception
 
 section .text
 
-;eflags|cs:eip|error code
-exception_handler :
-    pop eax ;take Error code and analyse it
-    push eax
+;handler|eflags|cs:eip|error code
+_general_protection_fault_handler_ :
+   pop eax
+   mov dword [_error_code_] , eax
     call exception
-    pop eax
-    iret
+  iret
     
 section .data 
 
