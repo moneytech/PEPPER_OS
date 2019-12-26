@@ -6,7 +6,8 @@ LDFLAGS := ld -m elf_i386 --oformat=binary -Tlinker.ld
 LINKER := kernel/initialisation/init.a
 
 
-all : 
+
+all :
 	make mixt
 	make disk
 	make launch
@@ -38,7 +39,6 @@ debug :
 
 %.o : %.c %.asm
 	@$(CC) -o $@ -c $< $(CFLAGS)
-	nasm -felf32 $< -o $@ 
 
 .PHONY : clean mrproper
 

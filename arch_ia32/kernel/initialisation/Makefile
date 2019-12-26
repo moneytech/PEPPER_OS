@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS := -m32 -g -ffreestanding -fno-PIC -fno-stack-protector -Werror
 
 
-OBJ := pit.o pit_asm.o pic.o idt.o idt_asm.o gdt.o
+OBJ := pit.o pit_asm.o pic.o idt.o gdt_idt_asm.o gdt.o
 OBJ += exceptions/exception_asm.o exceptions/exception.o
 OBJ += ../../stdlib/video.o ../../stdlib/lib.o 
 OBJ += interruptions/interrupt.o interruptions/interrupt_asm.o

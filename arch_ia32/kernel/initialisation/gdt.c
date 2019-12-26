@@ -85,8 +85,6 @@ void EncodeGDTEntry(struct gdtdesc *source , u8* target)
 void init_gdt(void){
 	print_address(LOADING_COLOR , GDTBASE) ;
 	write_string(READY_COLOR , " KERNEL : Configuration des segments\n") ;
-
-	kgdt = (struct gdtdesc*) (GDTBASE) ;
 	
 	/* initialisation des descripteurs de segment */
 	init_gdt_desc(0x0, 0x0, 0x0, 0x0, &kgdt[0]);
@@ -94,17 +92,25 @@ void init_gdt(void){
 	init_gdt_desc(0x0, 0xFFFFF, SEG_CODE_E_R_A | SEG_DESCTYPE (1) | SEG_PRIV (0) |	\
 						SEG_PRES (1), 0x0D, &kgdt[1]);	/* code */
 
-	init_gdt_desc(0x0, 0xFFFFF, SEG_DATA_R_W_A | SEG_DESCTYPE (1) | SEG_PRIV (0) |	\
-						SEG_PRES (1), 0x0D, &kgdt[2]);	/* data */
+	init_gdt_desc(0x0, 0xFFFFF, SEG_DATA_R_W_A |	\
+		SEG_DESCTYPE (1) | SEG_PRIV (0) | SEG_PRES (1), 0x0D, &kgdt[2]);	/* data */
 
+
+	init_gdt_desc(0x0, 0x0,SEG_DATA_R_W_EX_A |	\
+		SEG_DESCTYPE(1) | SEG_PRIV(0) | SEG_PRES(1), 0x0D, &kgdt[3]);
+
+	EncodeGDTEntry( (kgdt+4) , (u8*)(kgdt+4) ) ;
+	EncodeGDTEntry( (kgdt+8) , (u8*)(kgdt+8) ) ;
+
+	memcpy((char*)GDTBASE , (char*)kgdt , sizeof(struct gdtdesc)*GDTSIZE);
 
 	/* initialisation de la structure pour GDTR */
-	kgdtr.limite = (sizeof(struct gdtdesc)*GDTSIZE) + (unsigned short)GDTBASE ;
-	kgdtr.base = GDTBASE;
-
+	unsigned long gdt_adress = (unsigned long)GDTBASE ;
+	gdt_ptr[0] = (sizeof(struct gdtdesc)*GDTSIZE) + ((gdt_adress & 0xFFFF) << 16);
+	gdt_ptr[1] = gdt_adress >> 16 ;
 
 	/* chargement du registre GDTR */
-	asm("lgdtl (kgdtr)");
+	load_gdt(gdt_ptr) ;
 
 
 	/* initialisation des segments */

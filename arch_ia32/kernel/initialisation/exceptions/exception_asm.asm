@@ -5,8 +5,9 @@ extern _general_protection_
 section .text
     
     _general_protection_handler_ :
+        pop eax 
+        mov dword[_error_code_] , eax
         call _general_protection_
-        pop eax
         iret
 
 section .data 

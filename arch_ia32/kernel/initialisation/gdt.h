@@ -78,24 +78,18 @@ struct gdtdesc {
 } __attribute__((packed));
 
 /* Registre GDTR */
-struct gdtr {
-    u16 limite;
-    u32 base;
-} __attribute__((packed));
+unsigned int gdt_ptr[2] ;
 
 void init_gdt_desc(u32, u32, u8, u8, struct gdtdesc *);
 void init_gdt(void);
 void EncodeGDTEntry(struct gdtdesc *source, u8 *target);
-void init_tss(void);
 
-extern void load_user();
+extern void load_gdt(unsigned int *gdtr);
 
 #ifdef __GDT__
 struct gdtdesc *kgdt; /* GDT */
-struct gdtr kgdtr;    /* GDTR */
 #else
 extern struct gdtdesc kgdt[];
-extern struct gdtr kgdtr;
 #endif
 
 #endif // !_GDT_H
