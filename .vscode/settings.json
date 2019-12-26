@@ -1,6 +1,5 @@
 {
     "files.associations": {
-        "*.asm": "arm",
-        "idt.h": "c"
+        "*.yaml": "home-assistant"
     }
 }
