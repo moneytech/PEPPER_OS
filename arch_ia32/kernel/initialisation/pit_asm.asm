@@ -14,21 +14,22 @@ PIT_reload_value:        resw 1          ; Current PIT reload value
 
 
 section .text
+PIT_handler:
+   pushad
+  		call irq_PIT
+   popad
+	iret
 
 irq_PIT:
-
-    pushad
          call conserv_status_byte
         mov eax ,dword [IRQ0_fractions]
         mov ebx ,dword [IRQ0_ms]  ;eax.ebx = amount of time between IRQs
         add dword [system_timer_fractions] , eax  ;Update system timer ticks fractions
         adc dword [system_timer_ms] , ebx ;Update system timer ticks multi-seconde 
 
-        push byte 0
+        push dword 0
         call PIC_sendEOI
-        pop eax
-
-    popad
+         pop eax
     ret
 
 ;Initialize PIT
@@ -115,6 +116,4 @@ calculate_frequency:
     popad
     ret
 
-    PIT_handler:
-  		call irq_PIT
-	iret
+    

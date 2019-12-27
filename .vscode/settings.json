@@ -3,6 +3,10 @@
         "*.asm": "arm",
         "*.yaml": "home-assistant",
         "gdt.h": "c",
-        "idt.h": "c"
+        "idt.h": "c",
+        "lib.h": "c",
+        "pic.h": "c",
+        "video.h": "c",
+        "pit.h": "c"
     }
 }

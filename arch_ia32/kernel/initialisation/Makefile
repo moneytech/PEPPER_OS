@@ -13,6 +13,7 @@ MIXT = mixt
 all : $(MIXT)
 
 mixt : $(OBJ)
+	clear
 	ar cr init.a $^
 
 %.o : %.c

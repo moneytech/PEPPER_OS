@@ -17,6 +17,7 @@ debug_file:kernel.o
 
 
 mixt : kernel.o
+	clear
 	$(LDFLAGS) $^ $(LINKER) -o kernel.bin
 
 disk :

@@ -1,5 +1,6 @@
-#include "pic.h"
 #include "pit.h"
+#include "../../stdlib/video.h"
+#include "pic.h"
 
 void Init_PIT(char channel, unsigned int frequence) {
     frequency = frequence;
@@ -36,5 +37,6 @@ char read_back_channel(char channel) {
 
 void conserv_status_byte() {
     char status = read_back_channel(PIT_0);
+    write_string(ERROR_COLOR, "test");
     if (status != 0x34) Init_PIT(PIT_0, frequency);
 }

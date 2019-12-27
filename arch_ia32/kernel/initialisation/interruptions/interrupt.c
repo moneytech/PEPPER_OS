@@ -1,7 +1,9 @@
 #include "../io.h"
 #include "../pic.h"
+#include "../../../stdlib/video.h"
 
 void irq0_handler(void) {
+            write_string(ERROR_COLOR , "test\n");
           PIC_sendEOI(0) ;
 }
  
