@@ -103,12 +103,18 @@ void init_gdt(void) {
     /* chargement du registre GDTR */
     load_gdt(gdt_ptr);
 
-    /* initialisation des segments */
-    asm("   movw $0x10, %ax	\n \
+    /* Reinitialisation des segments */
+    __asm__ __volatile__(
+        "   movw $0x10, %ax	\n \
             movw %ax, %ds	\n \
             movw %ax, %es	\n \
             movw %ax, %fs	\n \
             movw %ax, %gs	\n \
             ljmp $0x08, $next	\n \
             next:		\n");
+    //Allocation de 10ko de pile
+    __asm__ __volatile__(
+        "movw $0x18, %ax \n \
+        movw %ax, %ss \n \
+        movl $0x20000, %esp");
 }
