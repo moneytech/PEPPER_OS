@@ -1,15 +1,20 @@
-global _general_protection_handler_ , _error_code_
+global __exception_handler__ , __error_code__
+global __exception_no_ERRCODE_handler__ 
 
-extern _general_protection_
+extern __exception__ , __exception_no_ERRCODE__
 
 section .text
     
-    _general_protection_handler_ :
+    __exception_handler__:
         pop eax 
-        mov dword[_error_code_] , eax
-        call _general_protection_
+        mov dword[__error_code__] , eax
+        call __exception__
+        iret
+
+    __exception_no_ERRCODE_handler__:
+        call __exception_no_ERRCODE__
         iret
 
 section .data 
 
-    _error_code_ dd 0
+    __error_code__ dd 0

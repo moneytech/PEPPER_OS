@@ -1,11 +1,4 @@
-#include "../../../stdlib/video.h"
+extern unsigned int __error_code__;
 
-
-extern unsigned int _error_code_ ;
-
-void _general_protection_(void)
-{
-    
-}
-
-
+void __exception__(void) {}
+void __exception_no_ERRCODE__(void) {}

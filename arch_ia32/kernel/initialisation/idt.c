@@ -1,3 +1,4 @@
+#define __IDT__
 #include "idt.h"
 #include "../../stdlib/lib.h"
 #include "../../stdlib/video.h"
@@ -13,6 +14,8 @@ void set_idt(unsigned short selector, unsigned char type, unsigned long offset, 
 }
 
 void init_idt() {
+    IDT = (struct IDT_entry *)IDTBASE;
+    //Initialisation du PIT
     Init_PIT(PIT_0, 0xDAAD);
 
     //On itiialise les intérruptions qu'on va utiliser
@@ -35,12 +38,31 @@ void init_idt() {
     set_idt(0x08, INTGATE, (unsigned long)irq14, 0x2E);
     set_idt(0x08, INTGATE, (unsigned long)irq15, 0x2F);
 
-    // set_idt(0x08 , INTGATE , (unsigned long)_general_protection_handler_ , 0xD) ;
+    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0x8);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xA);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xB);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xC);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xD);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xE);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0x11);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0x1E);
+
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x0);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x1);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x2);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x3);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x4);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x5);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x6);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x7);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x9);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x10);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x12);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x13);
+    set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x14);
 
     print_address(LOADING_COLOR, (unsigned int)IDTBASE);
     write_string(READY_COLOR, " KERNEL : Chargement de la Table d'interruption ...\n");
-
-    memcpy((char *)IDTBASE, (char *)IDT, sizeof(struct IDT_entry) * IDTSIZE);
 
     idt_address = (unsigned long)IDTBASE;
     idt_ptr[0] = (sizeof(struct IDT_entry) * IDTSIZE) + ((idt_address & 0xffff) << 16);

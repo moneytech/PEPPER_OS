@@ -78,6 +78,7 @@ void EncodeGDTEntry(struct gdtdesc *source, u8 *target) {
  * pas forcement a celle que l'on souhaite.
  */
 void init_gdt(void) {
+    kgdt = (struct gdtdesc *)GDTBASE;
     print_address(LOADING_COLOR, GDTBASE);
     write_string(READY_COLOR, " KERNEL : Configuration des segments\n");
 
@@ -92,8 +93,7 @@ void init_gdt(void) {
 
     EncodeGDTEntry((kgdt + 4), (u8 *)(kgdt + 4));
     EncodeGDTEntry((kgdt + 8), (u8 *)(kgdt + 8));
-
-    memcpy((char *)GDTBASE, (char *)kgdt, sizeof(struct gdtdesc) * GDTSIZE);
+    EncodeGDTEntry((kgdt + 12), (u8 *)(kgdt + 12));
 
     /* initialisation de la structure pour GDTR */
     unsigned long gdt_adress = (unsigned long)GDTBASE;

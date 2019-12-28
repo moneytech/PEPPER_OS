@@ -1,8 +1,8 @@
 #ifndef _GDT_H_
 
-    #define _GDT_H_
+#define _GDT_H_
 
-    #include "../../stdlib/i386types.h"
+#include "../../stdlib/i386types.h"
 
 #define GDTBASE 0x0  /* addr. physique ou doit resider la gdt */
 #define GDTSIZE 0xFF /* nombre max. de descripteurs dans la table */
@@ -78,7 +78,7 @@ struct gdtdesc {
 } __attribute__((packed));
 
 /* Registre GDTR */
-unsigned int gdt_ptr[2] ;
+unsigned int gdt_ptr[2];
 
 void init_gdt_desc(u32, u32, u8, u8, struct gdtdesc *);
 void init_gdt(void);
@@ -92,4 +92,4 @@ struct gdtdesc *kgdt; /* GDT */
 extern struct gdtdesc kgdt[];
 #endif
 
-#endif // !_GDT_H
+#endif  // !_GDT_H
