@@ -1,61 +1,68 @@
+#include "../../../stdlib/video.h"
 #include "../io.h"
 #include "../pic.h"
-#include "../../../stdlib/video.h"
 
 void irq0_handler(void) {
-            write_string(ERROR_COLOR , "test\n");
-          PIC_sendEOI(0) ;
+    write_string(ERROR_COLOR, "test\n");
+    PIC_sendEOI(0);
 }
- 
+
 void irq1_handler(void) {
-	   PIC_sendEOI(1) ;
+    PIC_sendEOI(1);
 }
- 
+
 void irq2_handler(void) {
- PIC_sendEOI(2) ;}
- 
+    PIC_sendEOI(2);
+}
+
 void irq3_handler(void) {
- PIC_sendEOI(3) ;}
- 
+    PIC_sendEOI(3);
+}
+
 void irq4_handler(void) {
- PIC_sendEOI(4) ;}
- 
+    PIC_sendEOI(4);
+}
+
 void irq5_handler(void) {
- PIC_sendEOI(5) ;}
- 
+    PIC_sendEOI(5);
+}
+
 void irq6_handler(void) {
- PIC_sendEOI(6) ;}
- 
+    PIC_sendEOI(6);
+}
+
 void irq7_handler(void) {
- PIC_sendEOI(7) ;}
- 
+    PIC_sendEOI(7);
+}
+
 void irq8_handler(void) {
- PIC_sendEOI(8) ;}
- 
+    PIC_sendEOI(8);
+}
+
 void irq9_handler(void) {
-           PIC_sendEOI(9) ;
+    PIC_sendEOI(9);
 }
- 
+
 void irq10_handler(void) {
-           PIC_sendEOI(10) ;
+    PIC_sendEOI(10);
 }
- 
+
 void irq11_handler(void) {
-           PIC_sendEOI(11) ;
+    PIC_sendEOI(11);
 }
- 
+
 void irq12_handler(void) {
-           PIC_sendEOI(12) ;
+    PIC_sendEOI(12);
 }
- 
+
 void irq13_handler(void) {
-           PIC_sendEOI(13) ;
+    PIC_sendEOI(13);
 }
- 
+
 void irq14_handler(void) {
-           PIC_sendEOI(14) ;
+    PIC_sendEOI(14);
 }
- 
+
 void irq15_handler(void) {
-          PIC_sendEOI(15) ;
+    PIC_sendEOI(15);
 }

@@ -8,14 +8,14 @@
 unsigned long idt_address;
 unsigned long idt_ptr[2];
 
-extern int load_idt(unsigned long int *idtr);
+extern int load_idt(unsigned long *idtptr);
 
 extern /* use IRQ 0 to accurately keep track of
     real time in milliseconds since the PIT was configured .
         cette interruption permettra d'eviter certaines incohérences
         pour la définitionsd e la fréquence
     */
-    unsigned long
+    unsigned long 
     PIT_handler(),
     __exception_handler__(), __exception_no_ERRCODE__();
 
@@ -26,7 +26,8 @@ struct IDT_entry {
     unsigned char zero;
     unsigned char type_attr;
     unsigned short int offset_higherbits;
-} __attribute__((packed));
+} __attribute__((__packed__));
+
 
 void init_idt(void);
 

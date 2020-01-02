@@ -95,13 +95,12 @@ void init_gdt(void) {
     EncodeGDTEntry((kgdt + 8), (u8 *)(kgdt + 8));
     EncodeGDTEntry((kgdt + 12), (u8 *)(kgdt + 12));
 
-    /* initialisation de la structure pour GDTR */
+     /* initialisation de la structure pour GDTR */
     unsigned long gdt_adress = (unsigned long)GDTBASE;
     gdt_ptr[0] = (sizeof(struct gdtdesc) * GDTSIZE) + ((gdt_adress & 0xFFFF) << 16);
     gdt_ptr[1] = gdt_adress >> 16;
 
-    /* chargement du registre GDTR */
-    load_gdt(gdt_ptr);
+    load_gdt(gdt_ptr) ;
 
     /* Reinitialisation des segments */
     __asm__ __volatile__(
@@ -116,5 +115,6 @@ void init_gdt(void) {
     __asm__ __volatile__(
         "movw $0x18, %ax \n \
         movw %ax, %ss \n \
-        movl $0x20000, %esp");
+        movl $0x20000, %esp \n  \
+        ");
 }

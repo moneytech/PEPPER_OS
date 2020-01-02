@@ -3,9 +3,12 @@ CFLAGS := -m32 -g -ffreestanding -fno-PIC -fno-stack-protector -Werror
 LDFLAGS := ld -m elf_i386 --oformat=binary -Tlinker.ld
 
 
-LINKER := kernel/initialisation/init.a
+LINKER := kernel/initialisation
 
-
+OBJ := $(LINKER)/pit.o $(LINKER)/pit_asm.o $(LINKER)/pic.o $(LINKER)/idt.o $(LINKER)/gdt_idt_asm.o $(LINKER)/gdt.o
+OBJ += $(LINKER)/exceptions/exception_asm.o $(LINKER)/exceptions/exception.o
+OBJ += stdlib/video.o stdlib/lib.o 
+OBJ += $(LINKER)/interruptions/interrupt.o $(LINKER)/interruptions/interrupt_asm.o
 
 all :
 	make mixt
@@ -18,7 +21,8 @@ debug_file:kernel.o
 
 mixt : kernel.o
 	clear
-	$(LDFLAGS) $^ $(LINKER) -o kernel.bin
+	$(LDFLAGS) $^ $(OBJ) -o kernel.bin
+
 
 disk :
 	dd if=/dev/zero of=disk.img bs=512 count=2880

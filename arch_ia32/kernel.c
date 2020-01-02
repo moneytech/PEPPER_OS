@@ -5,6 +5,8 @@
 
 void main() {
     pepper_screen();
+    cli;
     init_gdt();
     init_idt();
+    sti;
 }
