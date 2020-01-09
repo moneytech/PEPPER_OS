@@ -17,7 +17,8 @@ void write_string(unsigned char colour, const char string[40]);
 void pepper_screen();
 void scrollup();
 void putchar(unsigned char color, unsigned const char c);
-
+void kprintf(int nmber_param, ...);
+void print_frequence(unsigned int freq);
 /*Print ADDRESS*/
 
 void print_address(unsigned char color, unsigned int adress_);

@@ -1,40 +1,84 @@
 #include "video.h"
+#include <stdarg.h>
 
 void volatile pepper_screen() {
     volatile unsigned char *screen = (unsigned char *)(VIDEO_MEM);
     int i = 0;
-    while (i != 160 * 80) {
+    while (i != 160 * 24) {
         screen[i] = ' ';
         screen[i + 1] = 0x0;
         i += 2;
     }
 }
 
-void volatile write_string(unsigned char colour, const char string[40]) {
-    if (CURSOR_Y >= 25) {
-        scrollup();
-        CURSOR_X = 0;
-        CURSOR_Y = 0;
-    }
+void print_frequence(unsigned int freq) {
+    volatile unsigned char *pos = (unsigned char *)(VIDEO_MEM + 160 * 25 - 10);
+    unsigned char i = 10;
 
-    volatile unsigned char *vid;
-
-    while (*string != 0) {
-        vid = (unsigned char *)(VIDEO_MEM + 160 * CURSOR_Y + 2 * CURSOR_X);
-        if (*string == 10) {
-            CURSOR_X = 0;
-            CURSOR_Y++;
-            string++;
-        } else {
-            *(vid) = *string;
-            *(vid + 1) = colour;
-            string++;
-            vid += 2;
-
-            CURSOR_X++;
-        }
+    while (i > 0) {
+        freq %= 10;
+        pos[i] = (freq) + 0x30;
+        pos[i + 1] = ADVICE_COLOR;
+        i -= 2;
     }
 }
+
+void kprintf(int nmber_param, ...) {
+    int val = 0;
+    va_list ap;
+    int i, tab_param[nmber_param];
+
+    va_start(ap, nmber_param);
+
+    for (i = 0; i < nmber_param; i++) {
+        tab_param[i] = va_arg(ap, int);
+    }
+
+    unsigned char color = (unsigned char)tab_param[0];
+    char *string;
+
+    string = (char *)tab_param[1];
+
+    unsigned char j = 2;
+
+    while (*string) {
+        if (*string == '%') {
+            print_address(color, tab_param[j]);
+            j++;
+        } else
+            putchar(color, *string);
+
+        string++;
+    }
+
+    va_end(ap);
+}
+
+// void volatile write_string(unsigned char colour, const char string[40]) {
+//     if (CURSOR_Y >= 25) {
+//         scrollup();
+//         CURSOR_X = 0;
+//         CURSOR_Y = 0;
+//     }
+
+//     volatile unsigned char *vid;
+
+//     while (*string != 0) {
+//         vid = (unsigned char *)(VIDEO_MEM + 160 * CURSOR_Y + 2 * CURSOR_X);
+//         if (*string == 10) {
+//             CURSOR_X = 0;
+//             CURSOR_Y++;
+//             string++;
+//         } else {
+//             *(vid) = *string;
+//             *(vid + 1) = colour;
+//             string++;
+//             vid += 2;
+
+//             CURSOR_X++;
+//         }
+//     }
+// }
 
 void volatile scrollup() {
     unsigned volatile char *v = (unsigned char *)(VIDEO_MEM + 3840);
@@ -52,20 +96,30 @@ void volatile scrollup() {
 }
 
 void volatile putchar(unsigned char color, unsigned const char c) {
-    if (CURSOR_Y > 25) {
-        scrollup();
-        CURSOR_X = 0;
-        CURSOR_Y = 0;
-    }
-    unsigned char *v = (unsigned char *)(VIDEO_MEM + CURSOR_X * 2 + 160 * CURSOR_Y);
+    if (c != 10) {
+        if (CURSOR_Y > 25) {
+            scrollup();
+            CURSOR_X = 0;
+            CURSOR_Y = 0;
+        }
+        unsigned char *v = (unsigned char *)(VIDEO_MEM + CURSOR_X * 2 + 160 * CURSOR_Y);
 
-    if (c == 10) {
+        if (c == 10 || CURSOR_X == 80) {
+            CURSOR_X = 0;
+            CURSOR_Y++;
+            *(v) = c;
+            *(v + 1) = color;
+            CURSOR_X++;
+        } else {
+            *(v) = c;
+            *(v + 1) = color;
+            CURSOR_X++;
+        }
+    }
+
+    else {
         CURSOR_X = 0;
         CURSOR_Y++;
-    } else {
-        *(v) = c;
-        *(v + 1) = color;
-        CURSOR_X++;
     }
 }
 

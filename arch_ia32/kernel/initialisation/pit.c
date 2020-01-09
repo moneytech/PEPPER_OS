@@ -35,7 +35,11 @@ char read_back_channel(char channel) {
     return read_pit_count(PIT_0);
 }
 
+unsigned int compteur = 0;
+
 void conserv_status_byte() {
     char status = read_back_channel(PIT_0);
+    compteur++;
+    print_frequence(compteur % IRQ0_frequency);
     if (status != 0x34) Init_PIT(PIT_0, frequency);
 }

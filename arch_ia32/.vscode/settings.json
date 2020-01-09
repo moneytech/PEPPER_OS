@@ -6,7 +6,9 @@
         "idt.h": "c",
         "lib.h": "c",
         "video.h": "c",
-        "gdt.h": "c"
+        "gdt.h": "c",
+        "stdarg.h": "c",
+        "vector": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

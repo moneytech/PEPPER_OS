@@ -3,7 +3,7 @@ CFLAGS := -m32 -g -ffreestanding -fno-PIC -fno-stack-protector -Werror
 LDFLAGS := ld -m elf_i386 --oformat=binary -Tlinker.ld
 
 
-LINKER := kernel/initialisation
+LINKER = kernel/initialisation
 
 OBJ := $(LINKER)/pit.o $(LINKER)/pit_asm.o $(LINKER)/pic.o $(LINKER)/idt.o $(LINKER)/gdt_idt_asm.o $(LINKER)/gdt.o
 OBJ += $(LINKER)/exceptions/exception_asm.o $(LINKER)/exceptions/exception.o
@@ -15,14 +15,19 @@ all :
 	make disk
 	make launch
 
-debug_file:kernel.o
-	ld -m elf_i386 --oformat=elf32-i386 -Tlinker.ld $^ $(LINKER) -o kernel.elf
+debug_file:kernel.o $(OBJ)
+	ld -m elf_i386 --oformat=elf32-i386 -Tlinker.ld kernel.o $(OBJ) -o kernel.elf
 
 
-mixt : kernel.o
+mixt : kernel.o $(OBJ)
 	clear
-	$(LDFLAGS) $^ $(OBJ) -o kernel.bin
+	$(LDFLAGS) kernel.o $(OBJ) -o kernel.bin
+	
+%.o : %.c
+		@$(CC) -o $@ -c $< $(CFLAGS)
 
+%.o:%.asm		
+		nasm -felf32 $< -o $@
 
 disk :
 	dd if=/dev/zero of=disk.img bs=512 count=2880

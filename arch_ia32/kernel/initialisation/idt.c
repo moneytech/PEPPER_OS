@@ -5,7 +5,6 @@
 #include "pic.h"
 #include "pit.h"
 
-
 void set_idt(unsigned short selector, unsigned char type, unsigned long offset, unsigned short int vector) {
     IDT[vector].selector = selector;  //Kernelcode segment offset
     IDT[vector].type_attr = type;     //Interrupt gate
@@ -62,18 +61,13 @@ void init_idt() {
     set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x13);
     set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x14);
 
-    print_address(LOADING_COLOR, (unsigned int)IDTBASE);
-    write_string(READY_COLOR, " KERNEL : Chargement de la Table d'interruption ...\n");
-
     /* initialisation de la structure pour GDTR */
     unsigned long idt_adress = (unsigned long)IDTBASE;
     idt_ptr[0] = (sizeof(struct IDT_entry) * IDTSIZE) + ((idt_adress & 0xFFFF) << 16);
     idt_ptr[1] = idt_adress >> 16;
 
-    load_idt(idt_ptr) ;
+    kprintf(4, READY_COLOR,
+            "tableau d'interruption [%:%] charge\n", (int)IDTBASE, (int)idt_ptr[0]);
 
-
-    write_string(READY_COLOR, "KERNEL  : PIC,PIT initialises\n");
-    print_address(ADVICE_COLOR, (IRQ0_frequency));
-    write_string(ADVICE_COLOR, " KERNEL : frequence  du PIT ...\n");
+    load_idt(idt_ptr);
 }

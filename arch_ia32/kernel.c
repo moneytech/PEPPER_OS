@@ -9,4 +9,7 @@ void main() {
     init_gdt();
     init_idt();
     sti;
+    while (1)
+
+        ;
 }

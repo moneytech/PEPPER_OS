@@ -47,11 +47,10 @@ void EncodeGDTEntry(struct gdtdesc *source, u8 *target) {
 
     // Check the limit to make sure that it can be encoded
     if ((limit > 65536) && ((limit & 0xFFF) != 0xFFF))
-        write_string(ERROR_COLOR, "Reconfiguration des tailles des segments\n");
+        kprintf(2, LOADING_COLOR, "Reconfiguration des segments\n");
 
     if (limit > 65536) {
         // Adjust granularity if required
-        write_string(ADVICE_COLOR, "Ajustement des segments memoire\n");
         limit = limit >> 12;
         target[6] = 0xC0;
     } else
@@ -79,8 +78,6 @@ void EncodeGDTEntry(struct gdtdesc *source, u8 *target) {
  */
 void init_gdt(void) {
     kgdt = (struct gdtdesc *)GDTBASE;
-    print_address(LOADING_COLOR, GDTBASE);
-    write_string(READY_COLOR, " KERNEL : Configuration des segments\n");
 
     /* initialisation des descripteurs de segment */
     init_gdt_desc(0x0, 0x0, 0x0, 0x0, &kgdt[0]);
@@ -95,12 +92,15 @@ void init_gdt(void) {
     EncodeGDTEntry((kgdt + 8), (u8 *)(kgdt + 8));
     EncodeGDTEntry((kgdt + 12), (u8 *)(kgdt + 12));
 
-     /* initialisation de la structure pour GDTR */
+    /* initialisation de la structure pour GDTR */
     unsigned long gdt_adress = (unsigned long)GDTBASE;
     gdt_ptr[0] = (sizeof(struct gdtdesc) * GDTSIZE) + ((gdt_adress & 0xFFFF) << 16);
     gdt_ptr[1] = gdt_adress >> 16;
 
-    load_gdt(gdt_ptr) ;
+    kprintf(4, READY_COLOR, "Segments memoire CS,DS,SS [%,%,%]\n",
+            SEG_CODE_E_R_A, SEG_DATA_R_W_A, SEG_DATA_R_W_EX_A);
+    //0x8ffbc 0xa928
+    load_gdt(gdt_ptr);
 
     /* Reinitialisation des segments */
     __asm__ __volatile__(
