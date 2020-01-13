@@ -8,7 +8,8 @@
         "video.h": "c",
         "gdt.h": "c",
         "stdarg.h": "c",
-        "vector": "c"
+        "vector": "c",
+        "pic.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

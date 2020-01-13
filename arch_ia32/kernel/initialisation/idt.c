@@ -1,4 +1,3 @@
-#define __IDT__
 #include "idt.h"
 #include "../../stdlib/lib.h"
 #include "../../stdlib/video.h"
@@ -14,7 +13,6 @@ void set_idt(unsigned short selector, unsigned char type, unsigned long offset, 
 }
 
 void init_idt() {
-    IDT = (struct IDT_entry *)(IDTBASE);
     //Initialisation du PIT
     Init_PIT(PIT_0, 0xDAAD);
 
@@ -62,12 +60,12 @@ void init_idt() {
     set_idt(0x08, INTGATE, (unsigned long)__exception_no_ERRCODE__, 0x14);
 
     /* initialisation de la structure pour GDTR */
-    unsigned long idt_adress = (unsigned long)IDTBASE;
+    unsigned long idt_adress = (unsigned long)IDT;
     idt_ptr[0] = (sizeof(struct IDT_entry) * IDTSIZE) + ((idt_adress & 0xFFFF) << 16);
     idt_ptr[1] = idt_adress >> 16;
 
     kprintf(4, READY_COLOR,
-            "tableau d'interruption [%:%] charge\n", (int)IDTBASE, (int)idt_ptr[0]);
+            "tableau d'interruption [%:%] charge\n", (int)IDT, (int)idt_ptr[0]);
 
     load_idt(idt_ptr);
 }

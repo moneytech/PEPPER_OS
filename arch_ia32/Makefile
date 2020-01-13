@@ -3,12 +3,15 @@ CFLAGS := -m32 -g -ffreestanding -fno-PIC -fno-stack-protector -Werror
 LDFLAGS := ld -m elf_i386 --oformat=binary -Tlinker.ld
 
 
-LINKER = kernel/initialisation
+KERNEL_INIT = kernel/initialisation
+KERNEL_MEM = kernel/memory_management
 
-OBJ := $(LINKER)/pit.o $(LINKER)/pit_asm.o $(LINKER)/pic.o $(LINKER)/idt.o $(LINKER)/gdt_idt_asm.o $(LINKER)/gdt.o
-OBJ += $(LINKER)/exceptions/exception_asm.o $(LINKER)/exceptions/exception.o
+OBJ := $(KERNEL_INIT)/pit.o $(KERNEL_INIT)/pit_asm.o $(KERNEL_INIT)/pic.o $(KERNEL_INIT)/idt.o $(KERNEL_INIT)/gdt_idt_asm.o $(KERNEL_INIT)/gdt.o
+OBJ += $(KERNEL_INIT)/exceptions/exception_asm.o $(KERNEL_INIT)/exceptions/exception.o
 OBJ += stdlib/video.o stdlib/lib.o 
-OBJ += $(LINKER)/interruptions/interrupt.o $(LINKER)/interruptions/interrupt_asm.o
+OBJ += $(KERNEL_INIT)/interruptions/interrupt.o $(KERNEL_INIT)/interruptions/interrupt_asm.o
+
+OBJ += $(KERNEL_MEM)/paging/paging_asm.o $(KERNEL_MEM)/paging/paging.o
 
 all :
 	make mixt

@@ -15,7 +15,7 @@ extern /* use IRQ 0 to accurately keep track of
         cette interruption permettra d'eviter certaines incohérences
         pour la définitionsd e la fréquence
     */
-    unsigned long 
+    unsigned long
     PIT_handler(),
     __exception_handler__(), __exception_no_ERRCODE__();
 
@@ -27,7 +27,6 @@ struct IDT_entry {
     unsigned char type_attr;
     unsigned short int offset_higherbits;
 } __attribute__((__packed__));
-
 
 void init_idt(void);
 
@@ -50,13 +49,6 @@ extern int irq13();
 extern int irq14();
 extern int irq15();
 
-#ifdef __IDT__
-
-struct IDT_entry *IDT;
-
-#else
-extern struct IDT_entry IDT[IDTSIZE];
-
-#endif
+struct IDT_entry IDT[IDTSIZE];
 
 #endif  // !IDT_H

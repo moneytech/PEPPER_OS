@@ -77,8 +77,6 @@ void EncodeGDTEntry(struct gdtdesc *source, u8 *target) {
  * pas forcement a celle que l'on souhaite.
  */
 void init_gdt(void) {
-    kgdt = (struct gdtdesc *)GDTBASE;
-
     /* initialisation des descripteurs de segment */
     init_gdt_desc(0x0, 0x0, 0x0, 0x0, &kgdt[0]);
     //Configuration code, noyau, pile système
@@ -93,7 +91,7 @@ void init_gdt(void) {
     EncodeGDTEntry((kgdt + 12), (u8 *)(kgdt + 12));
 
     /* initialisation de la structure pour GDTR */
-    unsigned long gdt_adress = (unsigned long)GDTBASE;
+    unsigned long gdt_adress = (unsigned long)kgdt;
     gdt_ptr[0] = (sizeof(struct gdtdesc) * GDTSIZE) + ((gdt_adress & 0xFFFF) << 16);
     gdt_ptr[1] = gdt_adress >> 16;
 
