@@ -1,67 +1,50 @@
 #include "paging.h"
 #include "../../../stdlib/video.h"
 
-unsigned int __PAGE_DIRECTORY__[0x400] __attribute__((aligned(0x1000)));
+unsigned int __PAGE_DIRECTORY__[PAGE_DIRECTORY_OFFSET] __attribute__((aligned(PAGE_DIRECTORY_SIZE)));
+
+unsigned int __FIRST_PAGE_TABLE__[PAGE_TABLE_OFFSET] __attribute__((aligned(PAGE_TABLE_SIZE)));
 
 void init_paging() {
     unsigned int i = 0;
 
-    unsigned int __FIRST_PAGE_TABLE__[0x400] __attribute__((aligned(0x1000)));
-
     for (i = 0; i < 0x400; i++) __PAGE_DIRECTORY__[i] = PAGE_PRESENT(0) | PAGE_READ_WRITE;
 
-    for (i = 0; i < 0x400; i++) __FIRST_PAGE_TABLE__[i] = (i * 0x1000) | PAGE_PRESENT(1) | PAGE_READ_WRITE;
+    for (i = 0; i < 0x400; i++) __FIRST_PAGE_TABLE__[i] = (i << 12) | PAGE_PRESENT(1) | PAGE_READ_WRITE;
 
-    __PAGE_DIRECTORY__[0] = (unsigned int)__FIRST_PAGE_TABLE__ | PAGE_PRESENT(1) | PAGE_READ_WRITE;
+    __PAGE_DIRECTORY__[0] = ((unsigned int)__FIRST_PAGE_TABLE__) | PAGE_PRESENT(1) | PAGE_READ_WRITE;
 
     _EnablingPaging_();
 }
 
-void *get_phyaddr(void *vir_addr) {
-    unsigned int pdindex = (unsigned int)(vir_addr);
-    unsigned int ptindex = (unsigned int)(vir_addr);
+void *get_phyaddr(void *virtualaddr) {
+    unsigned long pdindex = (unsigned long)virtualaddr >> 22;
+    unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
 
-    pdindex >>= 22;
-    ptindex >>= 12 & 0x03FF;
+    unsigned long *pd = (unsigned long *)__PAGE_DIRECTORY__[pdindex];
 
-    //Vérifier si le PD est présent
-    if ((__PAGE_DIRECTORY__[pdindex] & 0x03) == (PAGE_PRESENT(1) | PAGE_READ_WRITE)) {
-        unsigned int *pt;
+    unsigned long *pt = (unsigned long *)pd[ptindex];
 
-        *pt = __PAGE_DIRECTORY__[pdindex] >> 12;  //Take the address of the page table
-
-        pt = (unsigned int *)(*pt);
-
-        if ((pt[ptindex] & 0x03) == (PAGE_PRESENT(1) | PAGE_READ_WRITE)) {
-            return (void *)(pt[ptindex] >> 12) + ((unsigned int)(vir_addr)&0x00000FFF);
-        } else {
-            kprintf(4, ERROR_COLOR, "No page table for %", vir_addr);
-            return vir_addr;
-        }
-
-    }
-
-    else {
-        kprintf(3, ERROR_COLOR, "No page directory for %", vir_addr);
-        return vir_addr;
-    }
+    return ((void *)(*pt & ~0xFFF) + ((unsigned int)virtualaddr & 0xFFF));
 }
 
-void map_page(void *virtual_address, void *physical_address, unsigned int flag) {
-    //Verifions les correspondanse
-    if (physical_address == (get_phyaddr(virtual_address))) {
-        unsigned int pdindex = (unsigned int)(virtual_address);
-        unsigned int ptindex = (unsigned int)(virtual_address);
+void map_page(void *virtualaddr, void *physaddr, unsigned int flags) {
+    // Make sure that both addresses are page-aligned.
 
-        pdindex >>= 22;
-        ptindex >>= 12 & 0x03FF;
+    unsigned long pdindex = (unsigned long)virtualaddr >> 22;
+    unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
 
-        //Vérifier si le PD est présent
+    unsigned long *pd = (unsigned long *)0xFFFFF000;
+    // Here you need to check whether the PD entry is present.
+    // When it is not present, you need to create a new empty PT and
+    // adjust the PDE accordingly.
 
-        unsigned int *pt;
+    unsigned long *pt = ((unsigned long *)0xFFC00000) + (0x400 * pdindex);
+    // Here you need to check whether the PT entry is present.
+    // When it is, then there is already a mapping present. What do you do now?
 
-        *pt = __PAGE_DIRECTORY__[pdindex] >> 12;
+    pt[ptindex] = ((unsigned long)physaddr) | (flags & 0xFFF) | 0x01;  // Present
 
-        pt = (unsigned int *)(*pt);
-    }
+    // Now you need to flush the entry in the TLB
+    // or you might not notice the change.
 }

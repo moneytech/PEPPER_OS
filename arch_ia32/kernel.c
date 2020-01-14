@@ -8,9 +8,8 @@ void main() {
     pepper_screen();
     cli;
     init_paging();
-    unsigned int *address_main = (unsigned int *)get_phyaddr((void *)0x9000);
+    kprintf(3, READY_COLOR, "\nMap kernel at physical address:% \n", get_phyaddr((void *)0x1000));
 
-    kprintf(3, READY_COLOR, "Map kernel at physical address:% \n", address_main);
     init_gdt();
 
     kprintf(2, READY_COLOR, "Chargement des segments\n");
