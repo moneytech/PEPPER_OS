@@ -21,9 +21,9 @@ void *get_phyaddr(void *virtualaddr) {
     unsigned long pdindex = (unsigned long)virtualaddr >> 22;
     unsigned long ptindex = (unsigned long)virtualaddr >> 12 & 0x03FF;
 
-    unsigned long *pd = (unsigned long *)__PAGE_DIRECTORY__[pdindex];
+    unsigned long *pd = (unsigned long *)__PAGE_DIRECTORY__ + (0x400 * pdindex);
 
-    unsigned long *pt = (unsigned long *)pd[ptindex];
+    unsigned long *pt = (unsigned long *)pd + (0x400 * ptindex);
 
     return ((void *)(*pt & ~0xFFF) + ((unsigned int)virtualaddr & 0xFFF));
 }
