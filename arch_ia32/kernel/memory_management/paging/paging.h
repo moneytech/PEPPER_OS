@@ -33,4 +33,6 @@ extern void _EnablingPaging_();
 // //ELle permet de modifier les options d'une page
 void map_page(void *virtual_address, void *physical_address, unsigned int flag);
 
+#define PAGING_LIMIT 0x400000
+
 #endif
