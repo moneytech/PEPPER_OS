@@ -1,10 +1,10 @@
 global _EnablingPaging_
-extern __PAGE_DIRECTORY__
+extern page_directory
 
 
 section .text
 _EnablingPaging_:
-    mov eax ,__PAGE_DIRECTORY__
+    mov eax ,page_directory
     mov cr3  , eax 
     mov eax , cr0
     or eax , 0x80000001
