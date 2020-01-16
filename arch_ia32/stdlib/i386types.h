@@ -1,14 +1,16 @@
 
 #ifndef _I386_TYPES_H
 
-    #define _I386_TYPES_H
+#define _I386_TYPES_H
 
-    typedef unsigned char u8 ;
-    typedef unsigned short u16 ;
-    typedef unsigned int u32 ;
-    typedef unsigned char uchar ;
-    typedef unsigned long u64 ;
-    typedef unsigned char bool ;
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long uint64_t;
 
-#endif // !TYPES_H
+typedef int int32_t;
+typedef long int64_t;
+typedef char int8_t;
+typedef short int16_t;
 
+#endif  // !TYPES_H

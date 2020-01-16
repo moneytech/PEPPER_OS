@@ -1,9 +1,10 @@
 #ifndef _PIT_H_
 #define _PIT_H_
 
+#include "../../stdlib/i386types.h"
 #include "io.h"
 
-unsigned int frequency;
+uint32_t frequency;
 
 /*
     I/O port     Usage
@@ -36,12 +37,12 @@ unsigned int frequency;
 //Pour connaître le statut d'une seule chaine
 //On pourra déterminer le statut d'un channel avant de configurer le channel
 //Ne pas confondre le statut d'un channel et sa donnée
-char read_back_channel(char channel);
+int8_t read_back_channel(int8_t channel);
 
 //Programmer une chaine PIT
 //Prenant en parametre un compteur
 
-void PIT_channel(short counter), Init_PIT(char channel, unsigned int frequency);
+void PIT_channel(int8_t counter), Init_PIT(int8_t channel, uint32_t frequency);
 
 extern void irq_PIT(), calculate_frequency();
 
@@ -62,11 +63,11 @@ extern void irq_PIT(), calculate_frequency();
     * then you have to prevent it.
 */
 #define read_pit_count(channel) ({ \
-    unsigned char byte[2];         \
+    int8_t byte[2];                \
     send_latch_command(channel);   \
     byte[0] = inb(channel);        \
     byte[1] = inb(channel);        \
-    (short)*(byte);                \
+    (uint16_t) * (byte);           \
 })
 /*
     *   Setting the current count
@@ -75,15 +76,15 @@ extern void irq_PIT(), calculate_frequency();
     * You must prevent other code from setting the PIT channel's 
     * reload value or reading its current count once you've sent the lowest 8 bits.
 */
-#define set_pit_count(channel, data) ({        \
-    outb(channel, (unsigned char)(data));      \
-    outb(channel, (unsigned char)(data >> 8)); \
+#define set_pit_count(channel, data) ({ \
+    outb(channel, (int8_t)(data));      \
+    outb(channel, (int8_t)(data >> 8)); \
 })
 
 //Envoyer une commande au PIT
 #define pit_send_command(cmd) set_pit_count(REGISTER_PIT, cmd);
 
-int system_timer_fractions, system_timer_ms, IRQ0_fractions, IRQ0_ms,
+int32_t system_timer_fractions, system_timer_ms, IRQ0_fractions, IRQ0_ms,
     IRQ0_frequency, PIT_reload_value;
 
 #endif

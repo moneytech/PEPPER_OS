@@ -9,7 +9,7 @@
  * desc est l'adresse lineaire du descripteur a initialiser.
  */
 
-void init_gdt_desc(u32 base, u32 limite, u8 acces, u8 other,
+void init_gdt_desc(uint32_t base, uint32_t limite, uint8_t acces, uint8_t other,
                    struct gdtdesc *desc) {
     desc->lim0_15 = (limite & 0xffff);
     desc->base0_15 = (base & 0xffff);
@@ -18,7 +18,7 @@ void init_gdt_desc(u32 base, u32 limite, u8 acces, u8 other,
     desc->lim16_19 = (limite & 0xf0000) >> 16;
     desc->other = (other & 0xf);
     desc->base24_31 = (base & 0xff000000) >> 24;
-    EncodeGDTEntry(desc, (u8 *)desc);
+    EncodeGDTEntry(desc, (uint8_t *)desc);
 }
 
 /**
@@ -26,7 +26,7 @@ void init_gdt_desc(u32 base, u32 limite, u8 acces, u8 other,
  * \param source An arbitrary structure describing the GDT entry
  */
 
-void EncodeGDTEntry(struct gdtdesc *source, u8 *target) {
+void EncodeGDTEntry(struct gdtdesc *source, uint8_t *target) {
     //Verifier la limite pour pouvoir l'encoder
 
     unsigned int limit, base;
@@ -86,12 +86,12 @@ void init_gdt(void) {
 
     init_gdt_desc(0x0, 0xFFFFFFFF, SEG_DATA_R_W_EX_A | SEG_DESCTYPE(1) | SEG_PRIV(0) | SEG_PRES(1), 0x0D, &kgdt[3]); /*Pour la pile*/
 
-    EncodeGDTEntry((kgdt + 4), (u8 *)(kgdt + 4));
-    EncodeGDTEntry((kgdt + 8), (u8 *)(kgdt + 8));
-    EncodeGDTEntry((kgdt + 12), (u8 *)(kgdt + 12));
+    EncodeGDTEntry((kgdt + 4), (uint8_t *)(kgdt + 4));
+    EncodeGDTEntry((kgdt + 8), (uint8_t *)(kgdt + 8));
+    EncodeGDTEntry((kgdt + 12), (uint8_t *)(kgdt + 12));
 
     /* initialisation de la structure pour GDTR */
-    unsigned long gdt_adress = (unsigned long)kgdt;
+    uint64_t gdt_adress = (uint64_t)kgdt;
     gdt_ptr[0] = (sizeof(struct gdtdesc) * GDTSIZE) + ((gdt_adress & 0xFFFF) << 16);
     gdt_ptr[1] = gdt_adress >> 16;
 

@@ -68,25 +68,23 @@
 
 /* Descripteur de segment */
 struct gdtdesc {
-    u16 lim0_15;
-    u16 base0_15;
-    u8 base16_23;
-    u8 acces;
-    u8 lim16_19 : 4;
-    u8 other : 4;
-    u8 base24_31;
+    uint16_t lim0_15;
+    uint16_t base0_15;
+    uint8_t base16_23;
+    uint8_t acces;
+    uint8_t lim16_19 : 4;
+    uint8_t other : 4;
+    uint8_t base24_31;
 } __attribute__((packed));
-
 
 /* Registre GDTR */
 unsigned long gdt_ptr[2];
 
-
-void init_gdt_desc(u32, u32, u8, u8, struct gdtdesc *);
+void init_gdt_desc(uint32_t, uint32_t, uint8_t, uint8_t, struct gdtdesc *);
 void init_gdt(void);
-void EncodeGDTEntry(struct gdtdesc *source, u8 *target);
+void EncodeGDTEntry(struct gdtdesc *source, uint8_t *target);
 
-extern void load_gdt(unsigned long * gdtptr);
+extern void load_gdt(unsigned long *gdtptr);
 
 #ifdef __GDT__
 struct gdtdesc *kgdt; /* GDT */

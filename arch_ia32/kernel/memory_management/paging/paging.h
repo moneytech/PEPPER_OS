@@ -7,6 +7,14 @@
 #define PAGE_TABLE_OFFSET 0X400
 #define PAGE_TABLE_SIZE 0X1000
 
+typedef struct {
+    unsigned int addr;
+} physaddr_t;
+
+typedef struct {
+    unsigned int addr;
+} virtaddr_t;
+
 #define PAGE_PRESENT(x) (x)                //Page present in table or directory
 #define PAGE_READ_WRITE (1 << 1)           //Page read or write in table or directory
 #define PAGE_READ_ONLY (0 << 1)            //Page read only
@@ -21,11 +29,13 @@
 #define PAGE_DIRTY(x) ((x) << 6)           //  Page with dirty flag
 #define PAGE_GLOBAL(x) ((x) << 7)
 
+#include "../../../stdlib/i386types.h"
+
 //Initialiation de la pagination
 void init_paging();
 
 //Déterminer l'addresse physique à partir d'un addresse virtuelle
-void *get_phyaddr(void *address_virtuel);
+physaddr_t *get_phyaddr(void *address_virtuel);
 
 //Activer la pagination
 extern void _EnablingPaging_();
