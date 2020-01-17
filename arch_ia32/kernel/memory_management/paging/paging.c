@@ -40,7 +40,10 @@ void map_page(void *virtual_address, void *physical_address, uint16_t flag_direc
     uint32_t pdindex = (uint32_t)virtual_address >> 22;
     uint32_t ptindex = (uint32_t)virtual_address >> 12 & 0x03FF;
 
-    if ((page_directory[pdindex] & 0x3) != 0x3) {                                        //Le directory n'existe pas
+    if ((page_directory[pdindex] & 0x3) != 0x3) {  //Le directory n'existe pas
+
+        kprintf(2, ADVICE_COLOR, "Creation d'addresse physique\n");
+
         page_directory[pdindex] = (pdindex << 12) | ((uint32_t)flag_directory & 0xFFF);  //On charge la table directory
 
         uint32_t *pt = (uint32_t *)(page_directory[pdindex] & 0xFFFFF000);
@@ -52,10 +55,12 @@ void map_page(void *virtual_address, void *physical_address, uint16_t flag_direc
 
     else  //Le directory existe
     {
+        kprintf(2, ADVICE_COLOR, "Creation de la table\n");
+
         uint32_t *pd = (uint32_t *)(page_directory[pdindex] & 0xFFFFF000);
 
         if ((pd[ptindex] & 0x3) == 0x3)
-            physical_address = (void *)get_phyaddr((void *)virtual_address);  //Le table et le directory existent
+            physical_address = (physaddr_t *)get_phyaddr((void *)virtual_address);  //Le table et le directory existent
 
         else  //Le directory existe mais le table n'existe pas
         {
