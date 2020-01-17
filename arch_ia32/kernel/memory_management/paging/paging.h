@@ -34,15 +34,16 @@ typedef struct virt_addr {
 //Initialiation de la pagination
 void init_paging();
 
-//Déterminer l'addresse physique à partir d'un addresse virtuelle
+/*
+    *   ELle permet de modifier les options d'une page
+    *   Retourne 'NoAddress' si il n'est pas paginé
+*/
 physaddr_t *get_phyaddr(void *address_virtuel);
 
 //Activer la pagination
 extern void _EnablingPaging_();
 
 // //ELle permet de modifier les options d'une page
-void map_page(void *virtual_address, void *physical_address, unsigned int flag);
-
-#define PAGING_LIMIT 0x400000
+void map_page(void *virtual_address, void *physical_address, uint16_t flag_directory, uint16_t flag_table);
 
 #endif

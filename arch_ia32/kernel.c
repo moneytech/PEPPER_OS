@@ -9,14 +9,11 @@ void main() {
     cli;
     init_paging();
 
-    physaddr_t *test_address;
-
-    test_address = get_phyaddr((void *)0x3ff000);
-    kprintf(3, ADVICE_COLOR, "Map  at physical address:% \n", test_address);
+    kprintf(4, READY_COLOR, "Map kernel at physical address [%, %]\n\nInitialisation de 4Mo de memoire physique\n\n", get_phyaddr((void *)0x000), get_phyaddr((void *)0x3ff000));
 
     init_gdt();
 
-    kprintf(2, READY_COLOR, "Chargement des segments\n");
+    kprintf(2, READY_COLOR, "Chargement des segments\n\n");
 
     init_idt();
     sti;

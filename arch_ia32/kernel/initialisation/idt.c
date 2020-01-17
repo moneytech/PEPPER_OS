@@ -64,8 +64,8 @@ void init_idt() {
     idt_ptr[0] = (sizeof(struct IDT_entry) * IDTSIZE) + ((idt_adress & 0xFFFF) << 16);
     idt_ptr[1] = idt_adress >> 16;
 
-    kprintf(4, READY_COLOR,
-            "tableau d'interruption [%:%] charge\n", (int)IDT, (int)idt_ptr[0]);
+    kprintf(5, READY_COLOR,
+            "Exceptions et interruptions remappees rechargees[int% : int%] charge\n\nFrequence d'horloge % \n\n", 0x20, 0x2f, IRQ0_frequency);
 
     load_idt(idt_ptr);
 }

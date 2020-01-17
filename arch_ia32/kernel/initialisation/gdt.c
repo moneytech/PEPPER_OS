@@ -95,7 +95,7 @@ void init_gdt(void) {
     gdt_ptr[0] = (sizeof(struct gdtdesc) * GDTSIZE) + ((gdt_adress & 0xFFFF) << 16);
     gdt_ptr[1] = gdt_adress >> 16;
 
-    kprintf(4, READY_COLOR, "Segments memoire CS,DS,SS [%,%,%]\n",
+    kprintf(4, READY_COLOR, "Segments memoire CS,DS,SS [%,%,%]\n\n",
             SEG_CODE_E_R_A, SEG_DATA_R_W_A, SEG_DATA_R_W_EX_A);
     //0x8ffbc 0xa928
     load_gdt(gdt_ptr);
