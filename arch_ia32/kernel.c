@@ -8,7 +8,11 @@ void main() {
     pepper_screen();
     cli;
     init_paging();
-    kprintf(3, ADVICE_COLOR, "Map  at physical address:% \n", get_phyaddr((void *)0x8ff000));
+
+    physaddr_t *test_address;
+
+    test_address = get_phyaddr((void *)0x3ff000);
+    kprintf(3, ADVICE_COLOR, "Map  at physical address:% \n", test_address);
 
     init_gdt();
 

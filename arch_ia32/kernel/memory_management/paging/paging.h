@@ -7,12 +7,12 @@
 #define PAGE_TABLE_OFFSET 0X400
 #define PAGE_TABLE_SIZE 0X1000
 
-typedef struct {
-    unsigned int addr;
+typedef struct phy_addr {
+    unsigned int addr_phy;
 } physaddr_t;
 
-typedef struct {
-    unsigned int addr;
+typedef struct virt_addr {
+    unsigned int addr_virt;
 } virtaddr_t;
 
 #define PAGE_PRESENT(x) (x)                //Page present in table or directory
