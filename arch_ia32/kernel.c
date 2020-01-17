@@ -13,7 +13,7 @@ void main() {
 
     init_gdt();
 
-    kprintf(2, READY_COLOR, "Chargement des segments\n\n");
+    kprintf(2, READY_COLOR, "\nChargement des segments\n\n");
 
     init_idt();
     sti;
