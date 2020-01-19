@@ -5,6 +5,8 @@ uint32_t page_directory[PAGE_DIRECTORY_OFFSET] __attribute__((aligned(PAGE_DIREC
 
 uint32_t first_page_table[PAGE_TABLE_OFFSET] __attribute__((aligned(PAGE_TABLE_SIZE)));
 
+extern uint32_t error_code;
+
 void init_paging() {
     uint16_t i = 0;
 
@@ -19,7 +21,7 @@ void init_paging() {
     return;
 }
 
-physaddr_t *get_phyaddr(void *virtualaddr) {
+physaddr_t *get_phyaddr(virtaddr_t *virtualaddr) {
     uint32_t pdindex = (uint32_t)virtualaddr >> 22;
     uint32_t ptindex = (uint32_t)virtualaddr >> 12 & 0x03FF;
 
@@ -36,13 +38,11 @@ physaddr_t *get_phyaddr(void *virtualaddr) {
         return (physaddr_t *)("NoAddress");
 }
 
-void map_page(void *virtual_address, void *physical_address, uint16_t flag_directory, uint16_t flag_table) {
+physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint16_t flag_table) {
     uint32_t pdindex = (uint32_t)virtual_address >> 22;
     uint32_t ptindex = (uint32_t)virtual_address >> 12 & 0x03FF;
 
     if ((page_directory[pdindex] & 0x3) != 0x3) {  //Le directory n'existe pas
-
-        kprintf(2, ADVICE_COLOR, "Creation d'addresse physique\n");
 
         page_directory[pdindex] = (pdindex << 12) | ((uint32_t)flag_directory & 0xFFF);  //On charge la table directory
 
@@ -50,23 +50,23 @@ void map_page(void *virtual_address, void *physical_address, uint16_t flag_direc
 
         pt[ptindex] = (ptindex << 12) | ((uint32_t)flag_table & 0xFFF);  //on charge la page table
 
-        physical_address = (void *)((pt[ptindex] & 0xFFFFF000) + ((uint32_t)virtual_address & 0xFFF));  //On modifie l'@ phy
+        return (physaddr_t *)((pt[ptindex] & 0xFFFFF000) + ((uint32_t)virtual_address & 0xFFF));  //On modifie l'@ phy
     }
 
     else  //Le directory existe
     {
-        kprintf(2, ADVICE_COLOR, "Creation de la table\n");
-
         uint32_t *pd = (uint32_t *)(page_directory[pdindex] & 0xFFFFF000);
 
         if ((pd[ptindex] & 0x3) == 0x3)
-            physical_address = (physaddr_t *)get_phyaddr((void *)virtual_address);  //Le table et le directory existent
+            return (physaddr_t *)get_phyaddr((void *)virtual_address);  //Le table et le directory existent
 
         else  //Le directory existe mais le table n'existe pas
         {
             pd[ptindex] = (ptindex << 12) | ((uint32_t)flag_table & 0xFFF);
 
-            physical_address = (void *)((pd[ptindex] & 0xFFFFF000) + ((uint32_t)virtual_address & 0xFFF));
+            return (physaddr_t *)((pd[ptindex] & 0xFFFFF000) + ((uint32_t)virtual_address & 0xFFF));
         }
     }
 }
+
+void Paging_fault() {}

@@ -1,5 +1,5 @@
 global _EnablingPaging_
-extern page_directory
+extern page_directory  , Paging_fault
 
 
 section .text
@@ -10,3 +10,12 @@ _EnablingPaging_:
     or eax , 0x80000001
     mov cr0 , eax
     ret
+
+PagingFault_Handler:
+    pop eax
+    mov dword[error_code] , eax
+    call Paging_fault
+    iret
+
+    section .data
+        error_code dd 0

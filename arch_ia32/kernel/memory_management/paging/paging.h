@@ -38,12 +38,11 @@ void init_paging();
     *   ELle permet de modifier les options d'une page
     *   Retourne 'NoAddress' si il n'est pas paginé
 */
-physaddr_t *get_phyaddr(void *address_virtuel);
+physaddr_t *get_phyaddr(virtaddr_t *virtualaddr);
 
 //Activer la pagination
 extern void _EnablingPaging_();
 
 // //ELle permet de modifier les options d'une page
-void map_page(void *virtual_address, void *physical_address, uint16_t flag_directory, uint16_t flag_table);
-
+physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint16_t flag_table);
 #endif
