@@ -45,4 +45,31 @@ extern void _EnablingPaging_();
 
 // //ELle permet de modifier les options d'une page
 physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint16_t flag_table);
+
+#include "../../../stdlib/lib.h"
+//Determiner la technologie de Pagination
+//Detecté le PSE
+#define DetectPSE32bit ((cpuid(0x1) & 0x08) >> 0x3)
+
+//Detecté le PGE
+#define DetectPGE ((cpuid(0x1) & 0x2000) >> 13)
+
+//Detecté le PAT
+#define DetectPAT ((cpuid(0x1) & 0x10000) >> 16)
+
+//Detecté le support d'addresse linéaire
+/*
+   CPUID.80000008H:EAX[15:8] reports the linear-address width supported by the processor. Generally, this
+    value is 48 if CPUID.80000001H:EDX.LM [bit 29] = 1 and 32 otherwise. (Processors that do not support CPUID
+    function 80000008H, support a linear-address width of 32.)
+*/
+#define LinearAddress ((cpuid(0x80000001) & 0x20000000) >> 29)
+
+//Detecté le support d'adressage physique
+/*
+    CPUID.80000008H:EAX[7:0] reports the physical-address width supported by the processor. (For processors
+    that do not support CPUID function 80000008H, the width is generally 36 if CPUID.01H:EDX.PAE [bit 6] = 1
+    and 32 otherwise.) This width is referred to as MAXPHYADDR. MAXPHYADDR is at most 52.
+*/
+#define PhysicalAddress ((cpuid(0x1) & 0x40) >> 6)
 #endif
