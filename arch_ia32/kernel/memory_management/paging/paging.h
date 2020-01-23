@@ -49,12 +49,27 @@ physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint1
 #include "../../../stdlib/lib.h"
 //Determiner la technologie de Pagination
 //Detecté le PSE
+/*
+    PSE: page-size extensions for 32-bit paging.
+    If CPUID.01H:EDX.PSE [bit 3] = 1, CR4.PSE may be set to 1, enabling support for 4-MByte pages with 32-bit
+    paging
+*/
 #define DetectPSE32bit ((cpuid(0x1) & 0x08) >> 0x3)
 
 //Detecté le PGE
+/*
+    PGE: global-page support.
+    If CPUID.01H:EDX.PGE [bit 13] = 1, CR4.PGE may be set to 1, enabling the global-page feature 
+*/
 #define DetectPGE ((cpuid(0x1) & 0x2000) >> 13)
 
 //Detecté le PAT
+/*
+    PAT: page-attribute table.
+    If CPUID.01H:EDX.PAT [bit 16] = 1, the 8-entry page-attribute table (PAT) is supported. When the PAT is
+    supported, three bits in certain paging-structure entries select a memory type (used to determine type of
+    caching used) from the PAT (see Section 4.9.2).
+*/
 #define DetectPAT ((cpuid(0x1) & 0x10000) >> 16)
 
 //Detecté le support d'addresse linéaire
