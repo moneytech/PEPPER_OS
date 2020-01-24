@@ -19,6 +19,8 @@ extern /* use IRQ 0 to accurately keep track of
     PIT_handler(),
     __exception_handler__(), __exception_no_ERRCODE__();
 
+extern void Paging_fault();
+
 //Descripteur de segment:
 struct IDT_entry {
     unsigned short int offset_lowerbits;
@@ -27,10 +29,6 @@ struct IDT_entry {
     unsigned char type_attr;
     unsigned short int offset_higherbits;
 } __attribute__((__packed__));
-
-void init_idt(void);
-
-void set_idt(unsigned short selector, unsigned char type, unsigned long offset, unsigned short int int_);
 
 extern int irq0();
 extern int irq1();
@@ -49,6 +47,12 @@ extern int irq13();
 extern int irq14();
 extern int irq15();
 
+#include "../../stdlib/i386types.h"
+
 struct IDT_entry IDT[IDTSIZE];
+
+void set_idt(uint16_t selector, uint8_t type, uint64_t offset, uint16_t vector);
+
+void init_idt(void);
 
 #endif  // !IDT_H

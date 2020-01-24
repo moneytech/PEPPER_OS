@@ -43,8 +43,15 @@ physaddr_t *get_phyaddr(virtaddr_t *virtualaddr);
 //Activer la pagination
 extern void _EnablingPaging_();
 
-// //ELle permet de modifier les options d'une page
+//ELle permet de maper une page
+/*
+    Elle renvoie l'adresse physique si la page existe
+    SI la page n'existe pas , on lui attribuera un flag au choix
+*/
 physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint16_t flag_table);
+
+//Elle permet de détruuire une page
+void unmap_page(virtaddr_t *virtual_address);
 
 #include "../../../stdlib/lib.h"
 //Determiner la technologie de Pagination

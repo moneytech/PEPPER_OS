@@ -24,9 +24,11 @@ void main() {
 
         init_paging();
 
+        unmap_page((virtaddr_t *)(0x3ff000));
+
         kprintf(2, READY_COLOR, "Enabling 32-bit paging \n\n");
 
-        kprintf(4, READY_COLOR, "Map kernel at physical address [%, % ]\n\nInitialisation de 4Mo de memoire physique\n\n",
+        kprintf(4, READY_COLOR, "Map kernel at physical address [%,%]\n\nInitialisation de 4Mo de memoire physique\n\n",
                 get_phyaddr((virtaddr_t *)0x000), get_phyaddr((virtaddr_t *)0x3ff000));
     }
 

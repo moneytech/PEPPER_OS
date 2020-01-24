@@ -4,7 +4,7 @@
 #include "pic.h"
 #include "pit.h"
 
-void set_idt(unsigned short selector, unsigned char type, unsigned long offset, unsigned short int vector) {
+void set_idt(uint16_t selector, uint8_t type, uint64_t offset, uint16_t vector) {
     IDT[vector].selector = selector;  //Kernelcode segment offset
     IDT[vector].type_attr = type;     //Interrupt gate
     IDT[vector].zero = 0;             //Only zero
@@ -41,7 +41,7 @@ void init_idt() {
     set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xB);
     set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xC);
     set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xD);
-    set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0xE);
+    set_idt(0x08, INTGATE, (unsigned long)Paging_fault, 0xE);
     set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0x11);
     set_idt(0x08, INTGATE, (unsigned long)__exception_handler__, 0x1E);
 
