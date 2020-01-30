@@ -75,7 +75,7 @@ void unmap_page(virtaddr_t *virtual_address);
     PAT: page-attribute table.
     If CPUID.01H:EDX.PAT [bit 16] = 1, the 8-entry page-attribute table (PAT) is supported. When the PAT is
     supported, three bits in certain paging-structure entries select a memory type (used to determine type of
-    caching used) from the PAT (see Section 4.9.2).
+    caching used) from the PAT
 */
 #define DetectPAT ((cpuid(0x1) & 0x10000) >> 16)
 
@@ -94,4 +94,24 @@ void unmap_page(virtaddr_t *virtual_address);
     and 32 otherwise.) This width is referred to as MAXPHYADDR. MAXPHYADDR is at most 52.
 */
 #define PhysicalAddress ((cpuid(0x1) & 0x40) >> 6)
+
+/*
+    Detect MTRRs
+    
+    The MTRRs are used to assign memory types to regions of
+    memory.
+    If the MTRR flag is set (indicating that the processor implements MTRRs)
+
+    The availability of the MTRR feature is model-specific. Software can determine if MTRRs are supported on a
+    processor by executing the CPUID instruction and reading the state of the MTRR flag (bit 12) in the feature infor-
+    mation register (EDX).
+
+    SYSENTER and SYSEXIT Instructions. 
+    The SYSENTER and SYSEXIT and associated MSRs are supported. 
+    12 MTRR Memory Type Range Registers. MTRRs are supported. 
+    The MTRRcap MSR contains feature bits that describe what memory types are supported, 
+    how many variable MTRRs are supported, and whether fixed MTRRs are supported.
+*/
+#define DetectMTRR ((cpuid(0x1) & 0x800) >> 11)
+
 #endif

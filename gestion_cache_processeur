@@ -1,0 +1,63 @@
+Methodes de CACHING :
+	Strong uncacheable (UC) : Ici , les emplacements mémoire du système ne sont pas mis de le cache.
+					Toutes les lectures et écritures apparaissent sur le système et
+					sont exécutés dans l'ordre du programme sans réorganisation.
+
+					Lorsqu'il est utilisé aves la RAM , il réduit considérablement
+					 les performances du processeurs
+
+					N.B : Les opérations de FP et SSE/SSE2 sur les opérandes dans la mémoire UC est
+					une implementation dépendantes
+
+	Uncacheable (UC-) : Ici , mêmes caratéristiques que UC , sauf que ce type de mémoire peut être outrepassé , en
+				programmant le MTRR pour les tyes de mémoires WC.
+				Ce type de mémoire est admissible sur les processeur de la famille PENTIUM
+
+	
+	Write Combining(WC) : Ne peuvent pas être dans le cache et elle n'est pas appliqué sur le BUS du processeur. L'écriture sera fait sur le buffer
+				(WC buffer)pour limiter les acces
+
+
+	Write-through (WT) : Ecrire et lire sur ou depuis le système de mémoire mise en cache. La lecture vient du cach hits
+				Toute les écritures sont faites sur le cach lines si possible et a travers le system de mémoire
+
+
+	Write-back (WB) :  Ecrire et lire sur ou depuis le système de mémoire mise en cache.  La lecture vient du cach lines
+
+
+	Write protected (WP) :
+
+Cache COntrol :
+	
+	Intel possède de varieter de mécanisme pour controller le cache des données et instructions
+	Et pour controller l'ordre de lecture et d'écritures entre le processeur , le cache et la memoire.
+
+	Le mecanisme peut être divisé en 2 groupes :
+		Cache controle registers :	Controle les locations de systeme cache de L1 , l2 et l3.Ce mechanisme
+					controle le cache des memoires virtuel de page et les régions de mémoire physique
+
+		Cache controle and memory ordering instructions : instructions that control le cache des données , l'ordre de lecture et d'écritures en mémoires
+							These instructions allow software to control that caching of specifiques strcutures
+
+
+
+	Cache controle registers :
+		Les architectures Intel 64 et IA-32 fournissent les registres et bits 
+		de contrôle de cache servants à utiliser pour activer ou restreindre la mise en cache à différentes pages ou régions en mémoire :
+
+			SI le CD flag de CR0 est à 0 , le cache est activer pour certaines parties de la mémoire système
+			mais doit être restreint pour les pages individuelles ou région de la mémoire par autre mecanisme de control de cache
+
+			Si le CD flagde CR0 est a 1 , le cache est restreint dans le cache du processeur(cache herarchy). Le cache doit être explicitement purgé
+			pour assurer la cohérence dans la mémoire.
+
+			Pour un haut niveau de performance de processeur , le CD et le NW flag doivent mis à 0, car le CD pourra purger le cache 
+			pour la conservation de la cohérence du cache, et le NW l'écriture se fera entre le cache et le buffer d'écriture et trop complex à implementer.
+
+						N.B : le NW nous avons le write through où les données sont écrits de manière synchrone dans le cache et 
+						le backing-store
+									Le write back où l'écriture se fait uniquement dans le cache. Le back store sera modifié jusqu'à 										ce qu'on modifie le cache
+
+
+
+			

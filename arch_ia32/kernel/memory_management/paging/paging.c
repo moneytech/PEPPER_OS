@@ -1,11 +1,11 @@
 #include "paging.h"
-#include "../../../stdlib/video.h"
 
 uint32_t page_directory[PAGE_DIRECTORY_OFFSET] __attribute__((aligned(PAGE_DIRECTORY_SIZE)));
 
 uint32_t first_page_table[PAGE_TABLE_OFFSET] __attribute__((aligned(PAGE_TABLE_SIZE)));
 
 extern uint32_t error_code;
+extern void _FlushPagingCache_();
 
 void init_paging() {
     uint16_t i = 0;
@@ -50,7 +50,10 @@ physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint1
 
         pt[ptindex] = (ptindex << 12) | ((uint32_t)flag_table & 0xFFF);  //on charge la page table
 
+        if (DetectPAT) _FlushPagingCache_();
+
         return (physaddr_t *)((pt[ptindex] & 0xFFFFF000) + ((uint32_t)virtual_address & 0xFFF));  //On modifie l'@ phy
+
     }
 
     else  //Le directory existe
@@ -64,6 +67,8 @@ physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint1
         {
             pd[ptindex] = (ptindex << 12) | ((uint32_t)flag_table & 0xFFF);
 
+            if (DetectPAT) _FlushPagingCache_();
+
             return (physaddr_t *)((pd[ptindex] & 0xFFFFF000) + ((uint32_t)virtual_address & 0xFFF));
         }
     }
@@ -74,7 +79,12 @@ void unmap_page(virtaddr_t *virtual_address) {
     uint32_t ptindex = (uint32_t)virtual_address >> 12 & 0x03FF;
 
     uint32_t *pd = (uint32_t *)(page_directory[pdindex] & 0xFFFFF000);
-    pd[ptindex] = 0x2;
+    pd[ptindex] = (PAGE_ACCESSED(1) | PAGE_PRESENT(1) | PAGE_READ_WRITE | PAGE_SUPERVISOR);
+
+    _FlushPagingCache_();
+}
+
+void InitRangesMemory() {
 }
 
 void Paging_fault() {}
