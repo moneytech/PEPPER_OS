@@ -16,11 +16,11 @@ void memcpy(int8_t *dest, int8_t *src, uint32_t i);
     edx;                               \
 })
 
-#define cpuidAllRegisters(code) ({             \
+#define cpuid_string(code) ({                  \
     uint32_t registers[0x4];                   \
     __asm__ __volatile__("cpuid"               \
                          : "=a"(registers[0]), \
-                           "=b"(regiters[1]),  \
+                           "=b"(registers[1]), \
                            "=c"(registers[2]), \
                            "=d"(registers[3])  \
                          : "a"(code));         \

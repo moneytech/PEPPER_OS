@@ -114,4 +114,6 @@ void unmap_page(virtaddr_t *virtual_address);
 */
 #define DetectMTRR ((cpuid(0x1) & 0x800) >> 11)
 
+#define NUMBER_PROCESSORS (((cpuid_string(0x4))[0]) >> 16)
+
 #endif

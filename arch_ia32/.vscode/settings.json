@@ -9,7 +9,9 @@
         "gdt.h": "c",
         "stdarg.h": "c",
         "vector": "c",
-        "pic.h": "c"
+        "pic.h": "c",
+        "caches.h": "c",
+        "system_error": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

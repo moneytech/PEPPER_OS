@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS := -m32 -g -ffreestanding -fno-PIC -fno-stack-protector -Werror
+CFLAGS := -m32 -g -ffreestanding -fno-PIC -fno-stack-protector -Wstringop-overflow -Werror
 LDFLAGS := ld -m elf_i386 --oformat=binary -Tlinker.ld
 
 

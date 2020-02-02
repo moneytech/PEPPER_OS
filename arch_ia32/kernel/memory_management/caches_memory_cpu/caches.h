@@ -1,13 +1,7 @@
 #ifndef _MEMORY_CACHES_
 #define _MEMORY_CACHES
-/*
-    The memory type range registers (MTRRs) provide a mechanism for 
-    associating the memory types with physical-address ranges in system memory.
-    They allow the processor to optimize operations for different types of memory such as RAM, 
-    ROM, frame-buffer memory, and memory-mapped I/O devices.
-*/
-void InitRangesMemory();
 
+#include "../../../stdlib/i386types.h"
 #include "../../../stdlib/lib.h"
 
 #define IA32_MTRRCAP_Address 0xFE
@@ -27,6 +21,9 @@ void InitRangesMemory();
 #define IA32_MTRRCAP (ReadMSR(IA32_MTRRCAP_Address)[0])
 
 /*
+    N.B :   The IA32_MTRRCAP MSR indicates the
+            availability of these registers on the processor
+
     The memory ranges and the types of memory 
     specified in each range are set by three groups of registers:
         ->  the IA32_MTRR_DEF_TYPE MSR
@@ -58,6 +55,13 @@ void InitRangesMemory();
         ->Registers IA32_MTRR_FIX4K_C0000 through IA32_MTRR_FIX4K_F8000 — Maps eight 32-KByte
             address ranges from C0000H to FFFFFH. This range is divided into sixty-four 4-KByte sub-ranges, 8 ranges per
             register.
+*/
+
+//  -----------     Variable Range MTRRs
+/*
+    processors permit software to specify the memory type for m variable-
+    size address ranges, using a pair of MTRRs for each range. The number m of ranges supported is given in bits 7:0
+    of the IA32_MTRRCAP MSR
 */
 
 #endif
