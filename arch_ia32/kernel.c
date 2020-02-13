@@ -4,7 +4,7 @@
 #include "kernel/memory_management/paging/paging.h"
 #include "stdlib/video.h"
 
-void main() {
+unsigned int main() {
     pepper_screen();
     cli;
 
@@ -24,10 +24,10 @@ void main() {
 
         init_paging();
 
-        kprintf(3, READY_COLOR, "Enabling 32-bit paging %\n\n", NUMBER_PROCESSORS);
+        kprintf(3, READY_COLOR, "Enabling 32-bit paging\n\n");
 
-        kprintf(4, READY_COLOR, "Map kernel at physical address [%,%]\n\nInitialisation de 4Mo de memoire physique\n\n",
-                get_phyaddr((virtaddr_t *)0x000), get_phyaddr((virtaddr_t *)(main)));
+        kprintf(3, READY_COLOR, "Map kernel at physical address [%]\n\nInitialisation de 4Mo de memoire physique\n\n",
+                get_phyaddr((virtaddr_t *)(main)));
     }
 
     init_gdt();
@@ -39,4 +39,6 @@ void main() {
 
     while (1)
         ;
+
+    return 0;
 }

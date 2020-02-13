@@ -15,6 +15,7 @@ OBJ += $(KERNEL_MEM)/paging/paging_asm.o $(KERNEL_MEM)/paging/paging.o
 
 all :
 	make mixt
+	make boot
 	make disk
 	make launch
 
@@ -31,6 +32,12 @@ mixt : kernel.o $(OBJ)
 
 %.o:%.asm		
 		nasm -felf32 $< -o $@
+
+boot:
+	nasm -g -f elf32 -F dwarf -o BOOT/boot.o BOOT/bootloader.asm
+	ld -melf_i386 -Ttext=0x7c00 -nostdlib --nmagic -o BOOT/boot.elf BOOT/boot.o
+	objcopy -O binary BOOT/boot.elf BOOT/boot.bin
+
 
 disk :
 	dd if=/dev/zero of=disk.img bs=512 count=2880

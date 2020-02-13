@@ -1,5 +1,5 @@
 [bits 16]
-org 0x7c00
+
 global _start
 _start:
     cli
@@ -13,20 +13,15 @@ _start:
                         ; 17*512 allows for a kernel.bin up to 8704 bytes
     mov bx, 0x9000      ; Load Kernel to ES:BX = 0x0000:0x9000
 
+    call load_kernel
+    call enable_A20
+
 ;   call graphics_mode  ; Uncomment if you want to switch to graphics mode 0x13
-    cli
     lgdt [gdtr]
-    sti
     mov eax, cr0
     or al, 1
     mov cr0, eax
     jmp CODE_SEG:init_pm
-
-
-
-    call load_kernel
-    call enable_A20
-
 
 graphics_mode:
     mov ax, 0013h
@@ -50,20 +45,20 @@ load_kernel:
     cmp dh , al         ; if AL ( sectors read ) != DH ( sectors expected )
     jne disk_error      ; display error message
     ret
-disk_error :
+disk_error:
     mov bx , ERROR_MSG
     call print_string
     hlt
 
 ; prints a null - terminated string pointed to by EDX
-print_string :
+print_string:
     pusha
     push es                   ;Save ES on stack and restore when we finish
 
     push VIDEO_MEMORY_SEG     ;Video mem segment 0xb800
     pop es
     xor di, di                ;Video mem offset (start at 0)
-print_string_loop :
+print_string_loop:
     mov al , [ bx ] ; Store the char at BX in AL
     mov ah , WHITE_ON_BLACK ; Store the attributes in AH
     cmp al , 0 ; if (al == 0) , at end of string , so
@@ -74,13 +69,14 @@ print_string_loop :
     add di , 2 ; Move to next character cell in vid mem.
     jmp print_string_loop ; loop around to print the next char.
 
-print_string_done :
+print_string_done:
     pop es                    ;Restore ES that was saved on entry
     popa
     ret ; Return from the function
 
-%include "a20.inc"
-%include "gdt.inc"
+%include "BOOT/a20.inc"
+%include "BOOT/gdt.inc"
+%include "BOOT/detect_mem.inc"
 
 [bits 32]
 init_pm:
@@ -97,7 +93,6 @@ init_pm:
     call 0x9000
     cli
 loopend:                                ;Infinite loop when finished
-    hlt
     jmp loopend
 
 [bits 16]
