@@ -29,7 +29,7 @@ do_E820:
     jmp .verify
 
 .do_E820_loop:
-    mov mov eax, 0xe820		; eax, ecx get trashed on every int 0x15 call
+    mov eax, 0xe820		; eax, ecx get trashed on every int 0x15 call
 	mov [es:di+20], dword 1	; force a valid ACPI 3.X entry
 	mov ecx, 24		; ask for 24 bytes again
 	int 0x15
