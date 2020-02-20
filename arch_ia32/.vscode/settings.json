@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "*.asm": "arm",
+        "*.asm": "x86 and x86_64 Assembly",
         "io.h": "c",
         "pit.h": "c",
         "idt.h": "c",
