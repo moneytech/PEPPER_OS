@@ -14,7 +14,6 @@ gdt_null:
   gdt_data:
   dw 0FFFFh
   dw 0
- 
   db 0
   db 10010010b
   db 11001111b

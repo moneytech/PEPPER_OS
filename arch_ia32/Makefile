@@ -35,15 +35,13 @@ mixt : kernel.o $(OBJ)
 
 boot:
 	nasm BOOT/bootloader.asm -f bin -o BOOT/boot.bin
-	# nasm -g -f elf32 -F dwarf -o BOOT/boot.o BOOT/bootloader.asm
-	# ld -melf_i386 -Ttext=0x7c00 -nostdlib --nmagic -o BOOT/boot.elf BOOT/boot.o
-	# objcopy -O binary BOOT/boot.elf BOOT/boot.bin
+	nasm BOOT/a20.asm -f bin -o BOOT/a20.bin
 
 
 disk :
 	dd if=/dev/zero of=disk.img bs=512 count=2880
 	dd if=BOOT/boot.bin of=disk.img bs=512 conv=notrunc
-	# dd if=kernel.bin of=disk.img bs=512 seek=1 conv=notrunc
+	dd if=BOOT/a20.bin of=disk.img bs=512 seek=1 conv=notrunc
 
 launch:
 	qemu-system-i386 -fda disk.img -d cpu_reset -d int -serial file:serial.log

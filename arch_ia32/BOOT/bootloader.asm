@@ -1,4 +1,5 @@
 bits 16
+org 0x0
 
 cli
 mov ax , 0x07c0
@@ -7,12 +8,19 @@ mov es , ax
 xor ax , ax
 mov ss , ax
 mov sp , 0x8000
-mov byte [BOOT_DRIVE] , dl ;récupération de l'unité de b00t
-mov dh , 30 ;Nombre dof sectors to read
+
+mov byte [BOOT_DRIVE] , dl ;récupération de l'unité de boot
 
 push di
     call do_e820
 pop di
+
+;load the second boot in memory
+mov dh , 1  ;Nombre de secteur à lire
+mov cl , 0x01   ;commencer la lecture au cl secteur
+mov bx  , 520
+mov si , message_boot
+call load_sectors_memory
 
 
     ;verify if the first space is more than 512*30 bytes before load the kernel
@@ -22,25 +30,30 @@ pop di
 
 
 
-    ;Load kernel at the firstuseable space
+    ;Load kernel at the first useable space
+    mov dh , 30 ;nombre de secteur à lire
+    mov cl , 0x2    ;commencer la lecture au cl secteur
     mov bx , [memory_useable_list]
-    call load_kernel
+    mov si , message_kernel
+    call load_sectors_memory
 
 
 jmp end
 
-mov bp , 3
+;ES:bx : Memory place
+;dh : number of sectors
 
-load_kernel:
+load_sectors_memory:
     push dx
+    mov bp , 3
+    load_sectors_memory_loop:
         xor ax , ax
         int 0x13
 
         mov ah , 0x02
         mov al,dh   ;Dh secteurs à lire.
-        mov ch , 0x0
-        mov dh , 0x00
-        mov cl , 0x02   ;commencer la lecture au second secteur
+        mov ch , 0x0    ;cylinder number
+        mov dh , 0x00   ;head number
         int 0x13
         jc disk_error
         pop dx
@@ -54,11 +67,10 @@ load_kernel:
         jne disk_error
 
 disk_error:
-    mov si , message
     call afficher
     dec bp
     cmp bp , 0
-    jne load_kernel
+    jne load_sectors_memory_loop
     hlt
 
 bad_space:
@@ -89,12 +101,12 @@ end:
         jmp end
 
     %include "BOOT/detect_mem.inc"
-    %include "BOOT/a20.inc"
 
 
 BOOT_DRIVE db 0
-message db "Hello , no noooooo",13,10,0
-bad_space_message db "Hello , no more space",13,10,0
+message_boot db "Bad file format boot",13,10,0
+message_kernel db "Bad file format kernel",13,10,0
+bad_space_message db "No more space",13,10,0
 
 BASE_KERNEL dd 0
 
