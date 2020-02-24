@@ -1,21 +1,11 @@
 bits 16
-jmp _boot_
-
-_boot_:
-cli
-mov ax , 0x07c0
-mov ds , ax
-mov es , ax
-xor ax , ax
-mov ss , ax
-mov sp , 0x8000
-sti
-
-mov byte [BOOT_DRIVE] , dl ;récupération de l'unité de boot
 
 push di
     call do_e820
 pop di
+
+mov si , bad_space_message
+call afficher
 
 call enabling_A20
 
@@ -29,15 +19,15 @@ call enabling_A20
     mov dh , 30 ;nombre de secteur à lire
     mov cl , 0x2    ;commencer la lecture au cl secteur
     mov bx , [memory_useable_list]
-    mov si , message_kernel
     call load_sectors_memory
     sti
 
+    jmp end
 
-jmp end
 
-;ES:bx : Memory place
-;dh : number of sectors
+    %include "BOOT/detect_mem.inc"
+    %include "BOOT/gdt.inc"
+    %include "BOOT/a20.inc"
 
 load_sectors_memory:
     push dx
@@ -69,11 +59,6 @@ disk_error:
     jne load_sectors_memory_loop
     hlt
 
-bad_space:
-    mov si , bad_space_message
-    call afficher
-    hlt
-    
 afficher:
     push ax
     push bx
@@ -92,23 +77,13 @@ afficher:
     pop ax
     ret
 
+    bad_space:
+    mov si , bad_space_message
+    call afficher
+    hlt
 
-end:
-        jmp end
-
-    %include "BOOT/detect_mem.inc"
-    %include "BOOT/a20.inc"
+    bad_space_message db "No more space",13,10,0
 
 
-BOOT_DRIVE db 0
-bad_space_message db "No more space",13,10,0
+end: jmp end
 
-message_boot db "Bad file format boot",13,10,0
-message_kernel db "Bad file format kernel",13,10,0
-
-BASE_KERNEL dd 0
-
-times 512-($-$$) db 0
-
-    db 0x55
-    db 0xAA

@@ -1,4 +1,4 @@
-    ;Test if A20 is already enabled - if it is you don't need to do anything at all
+     ;Test if A20 is already enabled - if it is you don't need to do anything at all
     ;Try the BIOS function. Ignore the returned status.
     ;Test if A20 is enabled (to see if the BIOS function actually worked or not)
     ;Try the keyboard controller method.
@@ -9,14 +9,22 @@
 
 
 enabling_A20:
+    ;Test if A20 is already enabled - if it is you don't need to do anything at all
     call  _check_a20_
     cmp ax , 1
     je  _enabled_
 
+    ;Try the BIOS function. Ignore the returned status.
     call _a20_BIOS_
     cmp ax , 0
     jne  _enabled_
 
+    ;Test if A20 is enabled (to see if the BIOS function actually worked or not)
+    
+
+    ret
+
+    
 _enabled_:
     ret
 

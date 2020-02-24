@@ -34,14 +34,13 @@ mixt : kernel.o $(OBJ)
 		nasm -felf32 $< -o $@
 
 boot:
-	nasm BOOT/bootloader.asm -f bin -o BOOT/boot.bin
-	nasm BOOT/a20.asm -f bin -o BOOT/a20.bin
-
+	nasm BOOT/boot_1.asm -f bin -o BOOT/boot_1.bin
+	nasm BOOT/boot_2.asm -f bin -o BOOT/boot_2.bin
 
 disk :
 	dd if=/dev/zero of=disk.img bs=512 count=2880
-	dd if=BOOT/boot.bin of=disk.img bs=512 conv=notrunc
-	dd if=BOOT/a20.bin of=disk.img bs=512 seek=1 conv=notrunc
+	dd if=BOOT/boot_1.bin of=disk.img bs=512 conv=notrunc
+	dd if=BOOT/boot_2.bin of=disk.img bs=512 seek=1 conv=notrunc
 
 launch:
 	qemu-system-i386 -fda disk.img -d cpu_reset -d int -serial file:serial.log
@@ -72,4 +71,4 @@ mrproper :
 	# $< le nom de la première dépendance
 	# $^ la liste des dépendances
 	# $? La liste des dépendances plus récente que la cible
-	# $* Le nom du fichier sans suffixe
+# $* Le nom du fichier sans suffixe

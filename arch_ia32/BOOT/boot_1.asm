@@ -1,7 +1,5 @@
 bits 16
-jmp _boot_
 
-_boot_:
 cli
 mov ax , 0x07c0
 mov ds , ax
@@ -9,30 +7,16 @@ mov es , ax
 xor ax , ax
 mov ss , ax
 mov sp , 0x8000
-sti
-
 mov byte [BOOT_DRIVE] , dl ;récupération de l'unité de boot
 
-push di
-    call do_e820
-pop di
+;load the second boot in memory
+mov dh , 1  ;Nombre de secteur à lire
+mov cl , 0x02   ;commencer la lecture au cl secteur
+mov bx  , 512
+mov si , no_boot
+call load_sectors_memory
 
-call enabling_A20
-
-
-    ;verify if the first space is more than 512*30 bytes before load the kernel
-    mov ecx , [memory_useable_list+8]
-    cmp ecx , 512*30
-    jb bad_space
-    ;Load kernel at the first useable space
-    cli
-    mov dh , 30 ;nombre de secteur à lire
-    mov cl , 0x2    ;commencer la lecture au cl secteur
-    mov bx , [memory_useable_list]
-    mov si , message_kernel
-    call load_sectors_memory
-    sti
-
+jmp 512
 
 jmp end
 
@@ -68,11 +52,6 @@ disk_error:
     cmp bp , 0
     jne load_sectors_memory_loop
     hlt
-
-bad_space:
-    mov si , bad_space_message
-    call afficher
-    hlt
     
 afficher:
     push ax
@@ -96,19 +75,11 @@ afficher:
 end:
         jmp end
 
-    %include "BOOT/detect_mem.inc"
-    %include "BOOT/a20.inc"
-
-
 BOOT_DRIVE db 0
-bad_space_message db "No more space",13,10,0
 
-message_boot db "Bad file format boot",13,10,0
-message_kernel db "Bad file format kernel",13,10,0
+no_boot db "No second boot",13,10,0
 
-BASE_KERNEL dd 0
-
-times 512-($-$$) db 0
+times 510-($-$$) db 0
 
     db 0x55
     db 0xAA
