@@ -1,17 +1,9 @@
 {
     "files.associations": {
-        "*.asm": "x86 and x86_64 Assembly",
-        "io.h": "c",
-        "pit.h": "c",
-        "idt.h": "c",
-        "lib.h": "c",
-        "video.h": "c",
-        "gdt.h": "c",
-        "stdarg.h": "c",
-        "vector": "c",
-        "pic.h": "c",
-        "caches.h": "c",
-        "system_error": "c"
+        "*.asm": "arm",
+        "*.yaml": "home-assistant",
+        "paging.h": "c",
+        "i386types.h": "c"
     },
     "C_Cpp.dimInactiveRegions": false
 }

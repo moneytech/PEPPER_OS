@@ -1,5 +1,6 @@
 bits 16
 
+
 push di
     call do_e820
 pop di
@@ -7,7 +8,6 @@ pop di
 mov si , bad_space_message
 call afficher
 
-call enabling_A20
 
 
     ;verify if the first space is more than 512*30 bytes before load the kernel
@@ -26,8 +26,7 @@ call enabling_A20
 
 
     %include "BOOT/detect_mem.inc"
-    %include "BOOT/gdt.inc"
-    %include "BOOT/a20.inc"
+    %include "BOOT/gdt_test.inc"
 
 load_sectors_memory:
     push dx
@@ -86,4 +85,7 @@ afficher:
 
 
 end: jmp end
+
+
+times 512-($-$$) db 144
 

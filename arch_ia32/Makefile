@@ -10,6 +10,7 @@ OBJ := $(KERNEL_INIT)/pit.o $(KERNEL_INIT)/pit_asm.o $(KERNEL_INIT)/pic.o $(KERN
 OBJ += $(KERNEL_INIT)/exceptions/exception_asm.o $(KERNEL_INIT)/exceptions/exception.o
 OBJ += stdlib/video.o stdlib/lib.o 
 OBJ += $(KERNEL_INIT)/interruptions/interrupt.o $(KERNEL_INIT)/interruptions/interrupt_asm.o
+OBJ += $(KERNEL_MEM)/mm.o
 
 OBJ += $(KERNEL_MEM)/paging/paging_asm.o $(KERNEL_MEM)/paging/paging.o
 
@@ -34,13 +35,26 @@ mixt : kernel.o $(OBJ)
 		nasm -felf32 $< -o $@
 
 boot:
-	nasm BOOT/boot_1.asm -f bin -o BOOT/boot_1.bin
-	nasm BOOT/boot_2.asm -f bin -o BOOT/boot_2.bin
+	nasm -g -f elf32 -F dwarf -o BOOT/boot.o BOOT/bootloader.asm
+	ld -melf_i386 -Ttext=0x7c00 -nostdlib --nmagic -o BOOT/boot.elf BOOT/boot.o
+	objcopy -O binary BOOT/boot.elf BOOT/boot.bin
 
 disk :
 	dd if=/dev/zero of=disk.img bs=512 count=2880
+	dd if=BOOT/boot.bin of=disk.img bs=512 conv=notrunc
+	dd if=kernel.bin of=disk.img bs=512 seek=1 conv=notrunc
+
+test:
+	clear
+	nasm BOOT/boot_1.asm -f bin -o BOOT/boot_1.bin
+	nasm BOOT/boot_2.asm -f bin -o BOOT/boot_2.bin
+
+	dd if=/dev/zero of=disk.img bs=512 count=2880
 	dd if=BOOT/boot_1.bin of=disk.img bs=512 conv=notrunc
 	dd if=BOOT/boot_2.bin of=disk.img bs=512 seek=1 conv=notrunc
+
+	qemu-system-i386 -fda disk.img  -d cpu_reset -d int -serial file:serial.log
+
 
 launch:
 	qemu-system-i386 -fda disk.img -d cpu_reset -d int -serial file:serial.log

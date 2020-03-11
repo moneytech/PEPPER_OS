@@ -6,9 +6,11 @@
 
 #define PAGE_TABLE_OFFSET 0X400
 #define PAGE_TABLE_SIZE 0X1000
+#define NO_PHYSICAL_ADDRESS    ((physaddr_t*)("NoPhysAddr"))
+#define PAGES_MEMORY_ZONE   ((physaddr_t*)0x10000)
 
 typedef struct phy_addr {
-    unsigned int addr_phy;
+    unsigned long addr_phy;
 } physaddr_t;
 
 typedef struct virt_addr {
@@ -29,10 +31,16 @@ typedef struct virt_addr {
 #define PAGE_DIRTY(x) ((x) << 6)           //  Page with dirty flag
 #define PAGE_GLOBAL(x) ((x) << 7)
 
+#define PAGE_VALID (PAGE_ACCESSED(1) | PAGE_READ_WRITE | PAGE_PRESENT(1) | PAGE_SUPERVISOR)
+
 #include "../../../stdlib/i386types.h"
 
 //Initialiation de la pagination
 void init_paging();
+
+
+//Get page knowing logical addresses
+static inline physaddr_t *_get_page_ (virtaddr_t *virtualaddr) ;
 
 /*
     *   ELle permet de modifier les options d'une page
@@ -115,5 +123,39 @@ void unmap_page(virtaddr_t *virtual_address);
 #define DetectMTRR ((cpuid(0x1) & 0x800) >> 11)
 
 #define NUMBER_PROCESSORS (((cpuid_string(0x4))[0]) >> 16)
+
+
+//32-bit paging may map linear addresses to either 4-KByte pages
+
+//The following items describe the 32-bit paging process in more detail as
+// well has how the page size is determined:
+
+    /*
+         A 4-KByte naturally aligned page directory is located at the physical 
+         address specified in bits 31:12 of CR3
+	 A page directory comprises 1024 32-bit entries (PDEs). A PDE is selected using 
+	 the physical address defined as follows:
+
+            bits  39:32 are all 0
+            bits 31:12 are for CR3
+            Bits 11:2 are bits 31:22 of the linear address
+            bits 1:0 are all 0
+
+            If CR4.PSE = 0 or the PDE’s PS flag is 0, a 4-KByte naturally aligned page table is located at the physical
+            address specified in bits 31:12 of the PDE
+		bits 39:32 are all 0
+		bits 31:32 are from the PDE
+		bits 11:2 are bits 21:12 of the linear address
+		bits 1:0 are all 0
+
+	Because the PTE is identified using bits 31:12 of the linear address , every PTE maps a 4Kbytes page. the final physical address is 
+	computed as follow:
+		bits 39:32 are all 0
+		bits 31:12 are from the PTE
+		bits 11:0 are from the oiginal linear address
+                
+    */
+
+
 
 #endif

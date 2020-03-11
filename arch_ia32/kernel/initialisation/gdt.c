@@ -86,10 +86,6 @@ void init_gdt(void) {
 
     init_gdt_desc(0x0, 0xFFFFFFFF, SEG_DATA_R_W_EX_A | SEG_DESCTYPE(1) | SEG_PRIV(0) | SEG_PRES(1), 0x0D, &kgdt[3]); /*Pour la pile*/
 
-    EncodeGDTEntry((kgdt + 4), (uint8_t *)(kgdt + 4));
-    EncodeGDTEntry((kgdt + 8), (uint8_t *)(kgdt + 8));
-    EncodeGDTEntry((kgdt + 12), (uint8_t *)(kgdt + 12));
-
     /* initialisation de la structure pour GDTR */
     uint64_t gdt_adress = (uint64_t)kgdt;
     gdt_ptr[0] = (sizeof(struct gdtdesc) * GDTSIZE) + ((gdt_adress & 0xFFFF) << 16);

@@ -1,0 +1,5 @@
+La pemière chose à faire ces de créer des zones pour le noyau.
+Mais n'oublions pas que nous devons créer des pages pour le matériel par rapport aux adresses mémoires.
+
+	-	Certains matérielles peuvent performer le DMA pour cetaines adresses mémoires ,
+	-	

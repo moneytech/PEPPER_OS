@@ -1,58 +1,10 @@
+%define BASE 0X07c0
+%define KSIZE 1
+
 bits 16
 
-cli
-mov ax , 0x07c0
-mov ds , ax
-mov es , ax
-xor ax , ax
-mov ss , ax
-mov sp , 0x8000
-mov byte [BOOT_DRIVE] , dl ;récupération de l'unité de boot
+jmp start
 
-;load the second boot in memory
-mov dh , 1  ;Nombre de secteur à lire
-mov cl , 0x02   ;commencer la lecture au cl secteur
-mov bx  , 512
-mov si , no_boot
-call load_sectors_memory
-
-jmp 512
-
-jmp end
-
-;ES:bx : Memory place
-;dh : number of sectors
-
-load_sectors_memory:
-    push dx
-    mov bp , 3
-    load_sectors_memory_loop:
-        xor ax , ax
-        int 0x13
-
-        mov ah , 0x02
-        mov al,dh   ;Dh secteurs à lire.
-        mov ch , 0x0    ;cylinder number
-        mov dh , 0x00   ;head number
-        int 0x13
-        jc disk_error
-        pop dx
-        cmp dh , al ;si le nombre de secteurs 
-                    ;lu est égales au nombre de secteur attendu
-        jne disk_error
-
-
-    .load_kernel_end:
-        cmp dh , al
-        jne disk_error
-
-disk_error:
-    call afficher
-    dec bp
-    cmp bp , 0
-    jne load_sectors_memory_loop
-    hlt
-    
 afficher:
     push ax
     push bx
@@ -72,14 +24,50 @@ afficher:
     ret
 
 
-end:
-        jmp end
 
-BOOT_DRIVE db 0
 
-no_boot db "No second boot",13,10,0
+start:
+    cli
+    mov ax , 0x07c0
+    mov ds , ax
+    mov es , ax
+    mov ss , ax
+    mov sp , 0xf000
 
-times 510-($-$$) db 0
+    mov [bootdrv] , dl
 
-    db 0x55
-    db 0xAA
+    mov si , msg
+    call afficher
+
+    xor ax , ax
+    int 13h
+
+    push es
+    mov ax , [BASE]
+    mov es , ax
+    mov bx , 512
+    mov ah , 0x2
+    mov al , [KSIZE]
+    mov ch , 0
+    mov cl , 2
+    mov dh , 0
+    mov dl , [bootdrv]
+    int 13h
+    jc erreur
+    pop es
+    cmp dh , al
+    jne erreur
+
+    jmp dword BASE:512
+
+erreur:
+    mov si , msg_erreur
+    call afficher
+    hlt
+
+msg: db "chargement",13,10,0
+msg_erreur: db "erreur de disque",13,10,0
+bootdrv: db 0
+
+times 510-($-$$) db 144
+dw 0xAA55

@@ -1,114 +1,109 @@
-bits 16
-jmp _boot_
+[bits 16]
 
-_boot_:
-cli
-mov ax , 0x07c0
-mov ds , ax
-mov es , ax
-xor ax , ax
-mov ss , ax
-mov sp , 0x8000
-sti
-
-mov byte [BOOT_DRIVE] , dl ;récupération de l'unité de boot
-
-push di
-    call do_e820
-pop di
-
-call enabling_A20
-
-
-    ;verify if the first space is more than 512*30 bytes before load the kernel
-    mov ecx , [memory_useable_list+8]
-    cmp ecx , 512*30
-    jb bad_space
-    ;Load kernel at the first useable space
+global _start
+_start:
     cli
-    mov dh , 30 ;nombre de secteur à lire
-    mov cl , 0x2    ;commencer la lecture au cl secteur
-    mov bx , [memory_useable_list]
-    mov si , message_kernel
-    call load_sectors_memory
-    sti
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov sp, 0x8000      ; Stack pointer at SS:SP = 0x0000:0x8000
+    mov [BOOT_DRIVE], dl; Boot drive passed to us by the BIOS
+    mov dh, 17          ; Number of sectors (kernel.bin) to read from disk
+                        ; 17*512 allows for a kernel.bin up to 8704 bytes
+    mov bx, 0x9000      ; Load Kernel to ES:BX = 0x0000:0x9000
 
+    call load_kernel
+    call enable_A20
 
-jmp end
+;   call graphics_mode  ; Uncomment if you want to switch to graphics mode 0x13
+    lgdt [gdtr]
+    mov eax, cr0
+    or al, 1
+    mov cr0, eax
+    jmp CODE_SEG:init_pm
 
-;ES:bx : Memory place
-;dh : number of sectors
-
-load_sectors_memory:
-    push dx
-    mov bp , 3
-    load_sectors_memory_loop:
-        xor ax , ax
-        int 0x13
-
-        mov ah , 0x02
-        mov al,dh   ;Dh secteurs à lire.
-        mov ch , 0x0    ;cylinder number
-        mov dh , 0x00   ;head number
-        int 0x13
-        jc disk_error
-        pop dx
-        cmp dh , al ;si le nombre de secteurs 
-                    ;lu est égales au nombre de secteur attendu
-        jne disk_error
-
-
-    .load_kernel_end:
-        cmp dh , al
-        jne disk_error
-
-disk_error:
-    call afficher
-    dec bp
-    cmp bp , 0
-    jne load_sectors_memory_loop
-    hlt
-
-bad_space:
-    mov si , bad_space_message
-    call afficher
-    hlt
-    
-afficher:
-    push ax
-    push bx
-.debut:
-    lodsb
-    ; ds:si -> al
-    cmp al, 0
-    ; fin chaîne ?
-    jz .fin
-    mov ah, 0x0E ; appel au service 0x0e, int 0x10 du bios
-    mov bx, 0x07 ; bx -> attribut, al -> caractère ASCII
-    int 0x10
-    jmp .debut
-.fin:
-    pop bx
-    pop ax
+graphics_mode:
+    mov ax, 0013h
+    int 10h
     ret
 
+load_kernel:
+                        ; load DH sectors to ES:BX from drive DL
+    push dx             ; Store DX on stack so later we can recall
+                        ; how many sectors were request to be read ,
+                        ; even if it is altered in the meantime
+    mov ah , 0x02       ; BIOS read sector function
+    mov al , dh         ; Read DH sectors
+    mov ch , 0x00       ; Select cylinder 0
+    mov dh , 0x00       ; Select head 0
+    mov cl , 0x02       ; Start reading from second sector ( i.e.
+                        ; after the boot sector )
+    int 0x13            ; BIOS interrupt
+    jc disk_error       ; Jump if error ( i.e. carry flag set )
+    pop dx              ; Restore DX from the stack
+    cmp dh , al         ; if AL ( sectors read ) != DH ( sectors expected )
+    jne disk_error      ; display error message
+    ret
+disk_error :
+    mov bx , ERROR_MSG
+    call print_string
+    hlt
 
-end:
-        jmp end
+; prints a null - terminated string pointed to by EDX
+print_string :
+    pusha
+    push es                   ;Save ES on stack and restore when we finish
 
-    %include "BOOT/detect_mem.inc"
-    %include "BOOT/a20.inc"
+    push VIDEO_MEMORY_SEG     ;Video mem segment 0xb800
+    pop es
+    xor di, di                ;Video mem offset (start at 0)
+print_string_loop :
+    mov al , [ bx ] ; Store the char at BX in AL
+    mov ah , WHITE_ON_BLACK ; Store the attributes in AH
+    cmp al , 0 ; if (al == 0) , at end of string , so
+    je print_string_done ; jump to done
+    mov word [es:di], ax ; Store char and attributes at current
+        ; character cell.
+    add bx , 1 ; Increment BX to the next char in string.
+    add di , 2 ; Move to next character cell in vid mem.
+    jmp print_string_loop ; loop around to print the next char.
 
+print_string_done :
+    pop es                    ;Restore ES that was saved on entry
+    popa
+    ret ; Return from the function
 
-BOOT_DRIVE db 0
-bad_space_message db "No more space",13,10,0
+%include "BOOT/a20.inc"
+%include "BOOT/gdt.inc"
 
-message_boot db "Bad file format boot",13,10,0
-message_kernel db "Bad file format kernel",13,10,0
+[bits 32]
+init_pm:
+    mov ax, DATA_SEG
+    mov ds, ax
+    mov ss, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
 
-BASE_KERNEL dd 0
+    mov ebp, 0x90000
+    mov esp, ebp
 
-times 512-($-$$) db 0
+    call 0x9000
+    cli
+loopend:                                ;Infinite loop when finished
+    hlt
+    jmp loopend
 
-    db 0x55
-    db 0xAA
+[bits 16]
+; Variables
+ERROR            db "A20 Error!" , 0
+ERROR_MSG        db "Error!" , 0
+BOOT_DRIVE:      db 0
+
+VIDEO_MEMORY_SEG equ 0xb800
+WHITE_ON_BLACK   equ 0x0f
+
+times 510-($-$$) db 0
+db 0x55
+db 0xAA

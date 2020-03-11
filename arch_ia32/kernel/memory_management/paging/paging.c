@@ -4,6 +4,7 @@ uint32_t page_directory[PAGE_DIRECTORY_OFFSET] __attribute__((aligned(PAGE_DIREC
 
 uint32_t first_page_table[PAGE_TABLE_OFFSET] __attribute__((aligned(PAGE_TABLE_SIZE)));
 
+
 extern uint32_t error_code;
 extern void _FlushPagingCache_();
 
@@ -16,33 +17,63 @@ void init_paging() {
 
     page_directory[0] = ((uint32_t)first_page_table) | (PAGE_ACCESSED(1) | PAGE_READ_WRITE | PAGE_PRESENT(1) | PAGE_SUPERVISOR);
 
-    _EnablingPaging_();
+   _EnablingPaging_();
+
 
     return;
 }
 
-physaddr_t *get_phyaddr(virtaddr_t *virtualaddr) {
+static inline physaddr_t *_get_page_ (virtaddr_t *virtualaddr)
+{
     uint32_t pdindex = (uint32_t)virtualaddr >> 22;
     uint32_t ptindex = (uint32_t)virtualaddr >> 12 & 0x03FF;
 
-    if ((page_directory[pdindex] & 0x23) == 0x23) {
+
+//Pour déterminer l'adresse physique , il me sufit de me placer dans la bonne page table
+//pour ensuite déteminer les 20 deniers bits et utiliser le décalage des 12 premiers bits
+    if ((page_directory[pdindex] & PAGE_VALID) == PAGE_VALID) {
         uint32_t *pd = (uint32_t *)(page_directory[pdindex] & 0xFFFFF000);
 
-        if ((pd[ptindex] & 0x23) == 0x23) {
+        if ((pd[ptindex] & PAGE_VALID) == PAGE_VALID) {
             uint32_t ptable = pd[ptindex] & 0xFFFFF000;
 
-            return (physaddr_t *)(ptable + ((uint32_t)(virtualaddr)&0xFFF));
+            return (physaddr_t *)(ptable);
         } else
-            return (physaddr_t *)("NoAddress");
+            return (physaddr_t *)("_NoAddress_");
     } else
-        return (physaddr_t *)("NoAddress");
+        return (physaddr_t *)("_NoAddress_");
+}
+
+
+physaddr_t *get_phyaddr(virtaddr_t *virtualaddr) {
+	
+	uint32_t pdindex = (uint32_t)virtualaddr >> 22;
+    uint32_t ptindex = (uint32_t)virtualaddr >> 12 & 0x03FF;
+
+    /*
+        A 4-KByte naturally aligned page directory is located at the physical 
+         address specified in bits 31:12 of CR3
+    */
+
+   if ((page_directory[pdindex] & PAGE_VALID) == PAGE_VALID)
+   {
+      uint32_t *pt=(uint32_t*)(page_directory[pdindex] & 0xFFFFF000) ;
+
+      if((pt[ptindex] & PAGE_VALID) == PAGE_VALID)
+      
+        return (physaddr_t*)((pt[ptindex]&0xFFFFF000)+(((uint32_t)virtualaddr)&0xFFF));
+      
+      else return (physaddr_t*)("_NoPhyAddr_") ;
+   }
+   else return (physaddr_t*)("_NoPhyAddr_") ;
+
 }
 
 physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint16_t flag_table) {
     uint32_t pdindex = (uint32_t)virtual_address >> 22;
     uint32_t ptindex = (uint32_t)virtual_address >> 12 & 0x03FF;
 
-    if ((page_directory[pdindex] & 0x23) != 0x23) {  //Le directory n'existe pas
+    if ((page_directory[pdindex] & PAGE_VALID) != PAGE_VALID) {  //Le directory n'existe pas
 
         page_directory[pdindex] = (pdindex << 12) | ((uint32_t)flag_directory & 0xFFF);  //On charge la table directory
 
@@ -60,7 +91,7 @@ physaddr_t *map_page(virtaddr_t *virtual_address, uint16_t flag_directory, uint1
     {
         uint32_t *pd = (uint32_t *)(page_directory[pdindex] & 0xFFFFF000);
 
-        if ((pd[ptindex] & 0x23) == 0x23)
+        if ((pd[ptindex] & PAGE_VALID) == PAGE_VALID)
             return (physaddr_t *)get_phyaddr((void *)virtual_address);  //Le table et le directory existent
 
         else  //Le directory existe mais le table n'existe pas

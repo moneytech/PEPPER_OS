@@ -5,8 +5,15 @@
 #include "stdlib/video.h"
 
 unsigned int main() {
+    
     pepper_screen();
     cli;
+
+     init_gdt();
+
+    kprintf(2, READY_COLOR, "Chargement des segments\n\n");
+
+    init_idt();
 
     if (DetectPSE32bit & DetectPGE & DetectPAT & DetectMTRR & DetectMSR) {
         kprintf(2, READY_COLOR,
@@ -26,15 +33,10 @@ unsigned int main() {
 
         kprintf(3, READY_COLOR, "Enabling 32-bit paging\n\n");
 
-        kprintf(3, READY_COLOR, "Map kernel at physical address [%]\n\nInitialisation de 4Mo de memoire physique\n\n",
+        kprintf(4, READY_COLOR, "Map kernel at physical address [%]\n\nInitialisation de 4Mo de memoire physique\n\n",
                 get_phyaddr((virtaddr_t *)(main)));
     }
 
-    init_gdt();
-
-    kprintf(2, READY_COLOR, "Chargement des segments\n\n");
-
-    init_idt();
     sti;
 
     while (1)

@@ -1,34 +1,25 @@
-     ;Test if A20 is already enabled - if it is you don't need to do anything at all
-    ;Try the BIOS function. Ignore the returned status.
-    ;Test if A20 is enabled (to see if the BIOS function actually worked or not)
-    ;Try the keyboard controller method.
-    ;Test if A20 is enabled in a loop with a time-out (as the keyboard controller method may work slowly)
-    ;Try the Fast A20 method last
-    ;Test if A20 is enabled in a loop with a time-out (as the fast A20 method may work slowly)
-    ;If none of the above worked, give up 
-
-
-enabling_A20:
-    ;Test if A20 is already enabled - if it is you don't need to do anything at all
-    call  _check_a20_
-    cmp ax , 1
-    je  _enabled_
-
-    ;Try the BIOS function. Ignore the returned status.
-    call _a20_BIOS_
-    cmp ax , 0
-    jne  _enabled_
-
-    ;Test if A20 is enabled (to see if the BIOS function actually worked or not)
-    
-
+enable_A20:
+    call check_a20
+    cmp ax, 1
+    je enabled
+    call a20_bios
+    call check_a20
+    cmp ax, 1
+    je enabled
+    call a20_keyboard
+    call check_a20
+    cmp ax, 1
+    je enabled
+    call a20_fast
+    call check_a20
+    cmp ax, 1
+    je enabled
+    mov bx, [ERROR]
+    call print_string
+enabled:
     ret
 
-    
-_enabled_:
-    ret
-
-_check_a20_:
+check_a20:
     pushf
     push ds
     push es
@@ -36,23 +27,26 @@ _check_a20_:
     push si
 
     cli
-
-    xor ax , ax
-    mov es,ax
-    not ax
-    mov ds , ax
-
-    mov di , 0x7DFE     ;es:di->0000:7c00
-    mov si , 0x7E0E     ;ds:si->FFFF:7E0E
-
-    mov ecx , [es:di]
-    cmp ecx , [ds:si]
-
+    xor ax, ax ; ax = 0
+    mov es, ax
+    not ax ; ax = 0xFFFF
+    mov ds, ax
+    mov di, 0x0500
+    mov si, 0x0510
+    mov al, byte [es:di]
+    push ax
+    mov al, byte [ds:si]
+    push ax
+    mov byte [es:di], 0x00
+    mov byte [ds:si], 0xFF
+    cmp byte [es:di], 0xFF
+    pop ax
+    mov byte [ds:si], al
+    pop ax
+    mov byte [es:di], al
     mov ax, 0
-
-    je  check_a20__exit  ;if it is different ; then A20 is already enable
-
-    mov ax , 1
+    je check_a20__exit
+    mov ax, 1
 
 check_a20__exit:
     pop si
@@ -60,43 +54,56 @@ check_a20__exit:
     pop es
     pop ds
     popf
-    
     ret
 
-_a20_BIOS_:
-    mov ax , 2403h  ;--- A20-Gate Support ---
-    int 15h
-    jb  _a20_not_supported_  ;INT 15h is not supported
-    cmp ah , 0
-    jnz  _a20_not_supported_ ;INT 15h is not supported
-
-    mov cx , 3
-    mov ax , 2402h  ;--- A20-Gate Status ---
-    int 15h
-    jb  _a20_failed_ ;couldn't get status
-    cmp ah , 0
-    jnz  _a20_failed_    ;couldn't get status
-
-    cmp al , 1
-    jz  _a20_activated_  ;A20 is already activated
-
-    mov ax , 2401h  ;--- A20-Gate Activate ---
-    int 15h
-    jb  _a20_failed_ ;couldn't activate the gate
-    cmp ah , 0
-    jnz  _a20_failed_    ;couldn't activate the gate
-
-_a20_activated_:
-    mov ax , 1
+a20_bios:
+    mov ax, 0x2401
+    int 0x15
     ret
 
-_a20_failed_:
-    dec cx
-    cmp cx , 0
-    jne  _a20_BIOS_
-    mov ax , 0
+a20_fast:
+    in al, 0x92
+    or al, 2
+    out 0x92, al
     ret
 
-_a20_not_supported_:
-    mov ax , 0
+    [bits 32]
+    [section .text]
+
+a20_keyboard:
+    cli
+
+    call    a20wait
+    mov     al,0xAD
+    out     0x64,al
+    call    a20wait
+    mov     al,0xD0
+    out     0x64,al
+    call    a20wait2
+    in      al,0x60
+    push    eax
+    call    a20wait
+    mov     al,0xD1
+    out     0x64,al
+    call    a20wait
+    pop     eax
+    or      al,2
+    out     0x60,al
+    call    a20wait
+    mov     al,0xAE
+    out     0x64,al
+    call    a20wait
+    sti
+    ret
+
+a20wait:
+    in      al,0x64
+    test    al,2
+    jnz     a20wait
+    ret
+
+a20wait2:
+    in      al,0x64
+    test    al,1
+    jz      a20wait2
     ret
