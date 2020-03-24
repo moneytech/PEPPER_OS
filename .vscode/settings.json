@@ -1,13 +1,9 @@
 {
+    "editor.formatOnSave": true,
+    "clang-format.executable": "/usr/bin/clang-format",
+    "C_Cpp.clang_format_style": "../.clang-format",
+    "C_Cpp.clang_format_fallbackStyle": "none",
     "files.associations": {
-        "*.asm": "asm",
-        "*.yaml": "home-assistant",
-        "gdt.h": "c",
-        "idt.h": "c",
-        "lib.h": "c",
-        "pic.h": "c",
-        "video.h": "c",
-        "pit.h": "c",
-        "i386types.h": "c"
+        "*.yaml": "home-assistant"
     }
 }

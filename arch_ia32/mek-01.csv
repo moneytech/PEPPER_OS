@@ -1,7 +1,0 @@
-
-BSSID, First time seen, Last time seen, channel, Speed, Privacy, Cipher, Authentication, Power, # beacons, # IV, LAN IP, ID-length, ESSID, Key
-E0:A3:AC:52:02:9B, 2020-03-09 17:48:30, 2020-03-09 17:56:37,  6, 270, WPA2, CCMP, PSK, -58,     4720,       20,   0.  0.  0.  0,  12, Mekongo_WLAN, 
-
-Station MAC, First time seen, Last time seen, Power, # packets, BSSID, Probed ESSIDs
-14:11:14:3F:46:E3, 2020-03-09 17:48:37, 2020-03-09 17:56:07, -71,       90, E0:A3:AC:52:02:9B,
-

@@ -10,11 +10,12 @@ OBJ := $(KERNEL_INIT)/pit.o $(KERNEL_INIT)/pit_asm.o $(KERNEL_INIT)/pic.o $(KERN
 OBJ += $(KERNEL_INIT)/exceptions/exception_asm.o $(KERNEL_INIT)/exceptions/exception.o
 OBJ += stdlib/video.o stdlib/lib.o 
 OBJ += $(KERNEL_INIT)/interruptions/interrupt.o $(KERNEL_INIT)/interruptions/interrupt_asm.o
-OBJ += $(KERNEL_MEM)/mm.o
+OBJ += $(KERNEL_MEM)/phy_mem.o
 
 OBJ += $(KERNEL_MEM)/paging/paging_asm.o $(KERNEL_MEM)/paging/paging.o
 
 all :
+	clear
 	make mixt
 	make boot
 	make disk
@@ -60,6 +61,7 @@ launch:
 	qemu-system-i386 -fda disk.img -d cpu_reset -d int -serial file:serial.log
 
 debug :
+	clear
 	make debug_file
 	qemu-system-i386 -fda disk.img -S -s &
 	gdb kernel.elf  \

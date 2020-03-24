@@ -8,7 +8,7 @@
 unsigned long idt_address;
 unsigned long idt_ptr[2];
 
-extern int load_idt(unsigned long *idtptr);
+extern int load_idt(unsigned long* idtptr);
 
 extern /* use IRQ 0 to accurately keep track of
     real time in milliseconds since the PIT was configured .
@@ -21,13 +21,13 @@ extern /* use IRQ 0 to accurately keep track of
 
 extern void Paging_fault();
 
-//Descripteur de segment:
+// Descripteur de segment:
 struct IDT_entry {
-    unsigned short int offset_lowerbits;
-    unsigned short int selector;
-    unsigned char zero;
-    unsigned char type_attr;
-    unsigned short int offset_higherbits;
+  unsigned short int offset_lowerbits;
+  unsigned short int selector;
+  unsigned char      zero;
+  unsigned char      type_attr;
+  unsigned short int offset_higherbits;
 } __attribute__((__packed__));
 
 extern int irq0();
@@ -55,4 +55,4 @@ void set_idt(uint16_t selector, uint8_t type, uint64_t offset, uint16_t vector);
 
 void init_idt(void);
 
-#endif  // !IDT_H
+#endif // !IDT_H
