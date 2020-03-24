@@ -54,6 +54,9 @@ _address_order_track_ alloc_page(uint32_t order) {
 
 	 new_page = (_address_order_track_*)(&MEMORY_SPACES_PAGES[i]);
 
+	 // If the first page doesn't have the first address at the start of the
+	 // memory chunk
+
 	 if (_page_area_track_->_address_ >= 0x100000 + (PAGE_SIZE * order)) {
 
 		new_page->_address_ = 0x100000;
